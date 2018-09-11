@@ -31,6 +31,7 @@ LAYERS += $(TOP)/build/layers/meta-intel
 
 REL_NR=15
 SNR_BASE=/wr/installs/ASE/snowridge/$(REL_NR)
+ASE_BASE=$(SNR_BASE)
 
 AXXIA_URL=git@github.com:axxia/meta-intel-axxia_private.git
 AXXIA_REL=snr_delivery$(REL_NR)
@@ -89,7 +90,7 @@ help::
 	$(ECHO) " distclean                 : remove $(TOP)/build directory"
 
 -include $(TOP)/lib.mk/ase-sample-datapath.mk
-
+-include $(TOP)/lib.mk/sim-ase.mk
 
 $(TOP)/build/poky:
 
