@@ -43,15 +43,15 @@ LAYERS += $(TOP)/build/layers/meta-intel-axxia
 ENABLE_AXXIA_RDK=yes
 ifeq ($(ENABLE_AXXIA_RDK),yes)
 
-LAYERS += $(TOP)/build/layers/meta-intel-axxia-rdk
-AXXIA_RDK_URL=git@github.com:axxia/meta-intel-axxia-rdk.git
-AXXIA_RDK_KLM=/wr/installs/ASE/snowridge/14.3/rdk_klm_src_*xz
-AXXIA_RDK_USER=/wr/installs/ASE/snowridge/14.3/rdk_user_src_*xz
-
 LAYERS += $(TOP)/build/layers/meta-dpdk
 DPDK_URL=https://git.yoctoproject.org/cgit/cgit.cgi/meta-dpdk
 DPDK_REL=9d2d7a606278131479cc5b6c8cad65ddea3ff9f6
 AXXIA_RDK_DPDKPATCH=/wr/installs/ASE/snowridge/14/dpdk_diff*.patch
+
+LAYERS += $(TOP)/build/layers/meta-intel-axxia-rdk
+AXXIA_RDK_URL=git@github.com:axxia/meta-intel-axxia-rdk.git
+AXXIA_RDK_KLM=/wr/installs/ASE/snowridge/14.3/rdk_klm_src_*xz
+AXXIA_RDK_USER=/wr/installs/ASE/snowridge/14.3/rdk_user_src_*xz
 
 endif
 
