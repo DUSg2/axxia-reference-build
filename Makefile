@@ -35,8 +35,11 @@ INTEL_URL=git://git.yoctoproject.org/meta-intel
 INTEL_REL=f66ce51d059d291a441d896854be8db70de5a554
 LAYERS += $(TOP)/build/layers/meta-intel
 
+REL_NR=15
+SNR_BASE=/wr/installs/ASE/snowridge/$(REL_NR)
+
 AXXIA_URL=git@github.com:axxia/meta-intel-axxia_private.git
-AXXIA_REL=snr_delivery14.3
+AXXIA_REL=snr_delivery$(REL_NR)
 LAYERS += $(TOP)/build/layers/meta-intel-axxia/meta-intel-snr
 LAYERS += $(TOP)/build/layers/meta-intel-axxia
 
@@ -46,12 +49,16 @@ ifeq ($(ENABLE_AXXIA_RDK),yes)
 LAYERS += $(TOP)/build/layers/meta-dpdk
 DPDK_URL=https://git.yoctoproject.org/cgit/cgit.cgi/meta-dpdk
 DPDK_REL=9d2d7a606278131479cc5b6c8cad65ddea3ff9f6
-AXXIA_RDK_DPDKPATCH=/wr/installs/ASE/snowridge/14/dpdk_diff*.patch
+AXXIA_RDK_DPDKPATCH=$(SNR_BASE)/dpdk_diff*.patch
 
 LAYERS += $(TOP)/build/layers/meta-intel-axxia-rdk
 AXXIA_RDK_URL=git@github.com:axxia/meta-intel-axxia-rdk.git
-AXXIA_RDK_KLM=/wr/installs/ASE/snowridge/14.3/rdk_klm_src_*xz
-AXXIA_RDK_USER=/wr/installs/ASE/snowridge/14.3/rdk_user_src_*xz
+AXXIA_RDK_KLM=$(SNR_BASE)/rdk_klm_src_*xz
+AXXIA_RDK_USER=$(SNR_BASE)/rdk_user_src_*xz
+
+AXXIA_ADK_LAYER=$(SNR_BASE)/adk_meta-intel-axxia-adknetd*
+AXXIA_ADK_SOURCE=$(SNR_BASE)/adk_source*
+LAYERS += $(TOP)/build/layers/meta-intel-axxia-adknetd
 
 endif
 
@@ -107,6 +114,11 @@ $(TOP)/build/layers/meta-intel-axxia-rdk:
 	cp $(AXXIA_RDK_DPDKPATCH) $@/downloads/dpdk_diff.patch
 	mkdir -p $@/downloads/unpacked
 	tar -C $@/downloads/unpacked -xf $(AXXIA_RDK_KLM)
+	cp $(TOP)/dpdk-rdk_18.05.bb $(TOP)/build/layers/meta-intel-axxia-rdk/recipes-extended/dpdk/
+
+$(TOP)/build/layers/meta-intel-axxia-adknetd:
+	tar -xzf $(AXXIA_ADK_LAYER) -C $(TOP)/build/layers
+	cp $(AXXIA_ADK_SOURCE) $(TOP)/build/layers/meta-intel-axxia-adknetd/downloads/adk_source.tiger_netd.tar.gz
 
 .PHONY: extract-rdk-patches
 extract-rdk-patches:
