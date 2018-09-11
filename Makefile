@@ -8,13 +8,7 @@
 TOP 		?= $(shell pwd)
 SHELL		?= /bin/bash
 
-# Define V=1 to echo everything
-V ?= 1
-ifneq ($(V),1)
-	Q=@
-endif
-
-RM = $(Q)rm -f
+-include $(TOP)/lib.mk/tools.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
 POKY_REL = 90414ecd5cf72995074f3dc6b05cfbee0a1dab67
@@ -62,6 +56,9 @@ LAYERS += $(TOP)/build/layers/meta-intel-axxia-adknetd
 
 endif
 
+SDK_FILE=$(TOP)/build/build/tmp/deploy/sdk/intel-axxia-indist-glibc-x86_64-axxia-image-sim*.sh
+AXXIA_RDK_SAMPLES=$(SNR_BASE)/samples/snr
+
 MACHINE=axxiax86-64
 
 IMAGE=axxia-image-sim
@@ -78,7 +75,21 @@ define bitbake-task
 	bitbake $(1) -c $(2)
 endef
 
-all: fs
+all: help
+
+help::
+	$(ECHO) "Current useful make targets"
+	$(ECHO) "======================================================="
+	$(ECHO) "\n--- build commands ---"
+	$(ECHO) " fs                     : builds a platform"
+	$(ECHO) " sdk                       : builds a sdk"
+	$(ECHO) " esdk                      : builds a esdk"
+	$(ECHO) " install-sdk               : installs the sdk"
+	$(ECHO) " clean                     : removes any platform build, sample compile or sdk install"
+	$(ECHO) " distclean                 : remove $(TOP)/build directory"
+
+-include $(TOP)/lib.mk/ase-sample-datapath.mk
+
 
 $(TOP)/build/poky:
 
@@ -163,6 +174,9 @@ fs: build/build
 
 sdk: build/build
 	$(call bitbake-task, $(IMAGE), populate_sdk)
+
+install-sdk:
+	$(SDK_FILE) -y -d $(TOP)/build/sdk
 
 esdk: build/build
 	$(call bitbake-task, $(IMAGE), populate_sdk_ext)
