@@ -89,6 +89,7 @@ help::
 	$(ECHO) " clean                     : removes any platform build, sample compile or sdk install"
 	$(ECHO) " distclean                 : remove $(TOP)/build directory"
 
+-include $(TOP)/lib.mk/dpdk.mk
 -include $(TOP)/lib.mk/ase-sample-datapath.mk
 -include $(TOP)/lib.mk/sim-ase.mk
 
