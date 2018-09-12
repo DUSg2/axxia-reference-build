@@ -12,9 +12,9 @@ build-rdk-sample-datapath:
 	fi; \
 	cd $(TOP)/build/samples/data_path_sample_multiFlow ; \
 	source $(TOP)/build/sdk/environment-setup-corei7-64-intelaxxia-linux ; \
-	export RTE_SDK=$(TOP)/build/sdk/sysroots/corei7-64-intelaxxia-linux/usr/share ; \
+	export RTE_SDK=$(DPDK_DIR) ; \
 	make clean ; \
-	make CROSS=$(CROSS_COMPILE) LIB_QAT18_DIR=$(OECORE_TARGET_SYSROOT)/usr LDFLAGS=" -lies_sdk -lae_client -lrte_pmd_ice_dsi" EXTRA_CFLAGS=" -mssse3"
+	make CROSS=$$CROSS_COMPILE EXTRA_CFLAGS=" -msse4.2 $$KCFLAGS" LIB_QAT18_DIR=$$OECORE_TARGET_SYSROOT/usr LDFLAGS=" -lies_sdk -lae_client -lrte_pmd_ice_dsi"
  
 $(TOP)/build/samples/data_path_sample_multiFlow/datapath-run.sh:
 	$(ECHO) "modprobe ice_sw" > $@
