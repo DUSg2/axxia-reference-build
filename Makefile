@@ -50,11 +50,6 @@ LAYERS += $(TOP)/build/layers/meta-intel-axxia-rdk
 AXXIA_RDK_URL=git@github.com:axxia/meta-intel-axxia-rdk.git
 AXXIA_RDK_KLM=$(SNR_BASE)/rdk_klm_src_*xz
 AXXIA_RDK_USER=$(SNR_BASE)/rdk_user_src_*xz
-
-AXXIA_ADK_LAYER=$(SNR_BASE)/adk_meta-intel-axxia-adknetd*
-AXXIA_ADK_SOURCE=$(SNR_BASE)/adk_source*
-LAYERS += $(TOP)/build/layers/meta-intel-axxia-adknetd
-
 endif
 
 SDK_FILE=$(TOP)/build/build/tmp/deploy/sdk/intel-axxia-indist-glibc-x86_64-axxia-image-sim*.sh
@@ -114,6 +109,7 @@ $(TOP)/build/layers/meta-intel-axxia:
 $(TOP)/build/layers/meta-intel-axxia/meta-intel-snr: $(TOP)/build/layers/meta-intel-axxia
 
 ifeq ($(ENABLE_AXXIA_RDK),yes)
+
 $(TOP)/build/layers/meta-dpdk:
 	git -C $(TOP)/build/layers clone $(DPDK_URL) $@
 	git -C $@ checkout $(DPDK_REL)
@@ -124,14 +120,8 @@ $(TOP)/build/layers/meta-intel-axxia-rdk:
 	mkdir -p $@/downloads
 	cp $(AXXIA_RDK_KLM) $@/downloads/rdk_klm_src.tar.xz
 	cp $(AXXIA_RDK_USER) $@/downloads/rdk_user_src.tar.xz
-	cp $(AXXIA_RDK_DPDKPATCH) $@/downloads/dpdk_diff.patch
 	mkdir -p $@/downloads/unpacked
 	tar -C $@/downloads/unpacked -xf $(AXXIA_RDK_KLM)
-	cp $(TOP)/dpdk-rdk_18.05.bb $(TOP)/build/layers/meta-intel-axxia-rdk/recipes-extended/dpdk/
-
-$(TOP)/build/layers/meta-intel-axxia-adknetd:
-	tar -xzf $(AXXIA_ADK_LAYER) -C $(TOP)/build/layers
-	cp $(AXXIA_ADK_SOURCE) $(TOP)/build/layers/meta-intel-axxia-adknetd/downloads/adk_source.tiger_netd.tar.gz
 
 .PHONY: extract-rdk-patches
 extract-rdk-patches:
@@ -159,7 +149,6 @@ build/build: build $(LAYERS)
 		sed -i s/^MACHINE.*/MACHINE\ =\ \"$(MACHINE)\"/g conf/local.conf ; \
 		echo "DISTRO = \"intel-axxia-indist\"" >> conf/local.conf ; \
 		echo "DISTRO_FEATURES_append = \" userspace\"" >> conf/local.conf ; \
-		echo "DISTRO_FEATURES_append = \" dpdk\"" >> conf/local.conf ; \
 		echo "RUNTARGET = \"simics\"" >> conf/local.conf ; \
 		echo "RELEASE_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
 		echo "PREFERRED_PROVIDER_virtual/kernel = \"linux-yocto\"" >> conf/local.conf ; \
