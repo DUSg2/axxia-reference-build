@@ -11,6 +11,8 @@ CONFIG_VHOST_ENABLED=n
 CONFIG_HAVE_NUMA=y
 CONFIG_EXAMPLE_VM_POWER_MANAGER=n
 
+SDK_ENV=$(TOP)/build/sdk/environment-setup-core2-64-intelaxxia-linux
+
 help:: dpdk.help
 
 dpdk.help:
@@ -51,13 +53,13 @@ dpdk-config: dpdk-fetch
 		sed -e "s#CONFIG_RTE_EAL_NUMA_AWARE_HUGEPAGES=.*#CONFIG_RTE_EAL_NUMA_AWARE_HUGEPAGES=$(CONFIG_HAVE_NUMA)#" -i $(DPDK_DIR)/config/common_linuxapp; \
 		sed -e "s#CONFIG_RTE_LIBRTE_POWER=y#CONFIG_RTE_LIBRTE_POWER=$(CONFIG_EXAMPLE_VM_POWER_MANAGER)#" -i $(DPDK_DIR)/config/common_linuxapp; \
 		cd $(DPDK_DIR) ; \
-		source $(TOP)/build/sdk/environment-setup-corei7-64-intelaxxia-linux ; \
+		source $(SDK_ENV) ; \
 		make O=$(RTE_TARGET) T=$(RTE_TARGET) config ;\
 	fi;
 
 dpdk-build: dpdk-config
 	$(CD) $(DPDK_DIR)/$(RTE_TARGET); \
-	source $(TOP)/build/sdk/environment-setup-corei7-64-intelaxxia-linux ; \
+	source $(SDK_ENV) ; \
 	export LIB_CPKAE_DIR=$$SDKTARGETSYSROOT/usr/lib ; \
 	export IES_API_DIR=$$SDKTARGETSYSROOT/usr/lib ; \
 	export LIB_QAT18_DIR=$$SDKTARGETSYSROOT/usr/lib; \
@@ -65,7 +67,7 @@ dpdk-build: dpdk-config
 
 dpdk-build-examples: dpdk-config
 	$(CD) $(DPDK_DIR)/examples; \
-	source $(TOP)/build/sdk/environment-setup-corei7-64-intelaxxia-linux ; \
+	source $(SDK_ENV) ; \
 	export LIB_CPKAE_DIR=$$SDKTARGETSYSROOT/usr/lib ; \
 	export IES_API_DIR=$$SDKTARGETSYSROOT/usr/lib ; \
 	export LIB_QAT18_DIR=$$SDKTARGETSYSROOT/usr/lib; \
@@ -75,7 +77,7 @@ dpdk-build-examples: dpdk-config
 
 dpdk-build-tests: dpdk-config
 	$(CD) $(DPDK_DIR)/test; \
-        source $(TOP)/build/sdk/environment-setup-corei7-64-intelaxxia-linux ; \
+        source $(SDK_ENV) ; \
         export LIB_CPKAE_DIR=$$SDKTARGETSYSROOT/usr/lib ; \
         export IES_API_DIR=$$SDKTARGETSYSROOT/usr/lib ; \
         export LIB_QAT18_DIR=$$SDKTARGETSYSROOT/usr/lib; \

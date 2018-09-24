@@ -1,7 +1,9 @@
 # Intel/Axxia stuff
-TOPOLOGY_TEMPLATE=$(SNR_BASE)/samples/snr/data_path_sample_multiFlow/topology.xml
+TOPOLOGY_TEMPLATE=$(SNR_DIR)/samples/snr/data_path_sample_multiFlow/topology.xml
 TOPOLOGY=topology.xml
-BIOS=$(SNR_BASE)/ase/images/snr_bios.bin
+ASE_DIR=$(REF_SNR_DIR)/ase
+BIOS=$(ASE_DIR)/images/snr_bios.bin
+ASESIM=$(ASE_DIR)/asesim
 
 export LM_LICENSE_FILE=/wr/installs/ASE/snowridge/licenses/simics-axxia-wr.lic
 export SIMICS_LICENSE_FILE=$(LM_LICENSE_FILE)
@@ -40,7 +42,7 @@ sim-run:
 	fi ;
 	$(CD) $(PLATFORM) ; \
 	rm $(PLATFORM)/*.log 2>/dev/null ; \
-	$(ASE_BASE)/ase/asesim -N -t $(TOPOLOGY) -l file >stdout.log 2>stderr.log & \
+	$(ASESIM) -N -t $(TOPOLOGY) -l file >stdout.log 2>stderr.log & \
 	while [ -z $$TELNET_PORT ] ; do \
 		TELNET_PORT=$$(grep "Telnet console listening to port" $(PLATFORM)/ase.sim.log 2>/dev/null | sed 's/[^0-9]*//g') ; \
 		sleep 5 ; \
