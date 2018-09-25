@@ -11,11 +11,12 @@ build-rdk-sample-datapath:
 		cp -r $(AXXIA_RDK_SAMPLES)/data_path_sample_multiFlow $(TOP)/build/samples ; \
 	fi; \
 	cd $(TOP)/build/samples/data_path_sample_multiFlow ; \
-	source $(TOP)/build/sdk/environment-setup-core2-64-intelaxxia-linux ; \
-	export RTE_SDK=$(DPDK_DIR) ; \
+	source $(SDK_ENV) ; \
+	export RTE_SDK=$(TOP)/build/dpdk ; \
 	make clean ; \
+	export LIB_CPKAE_DIR=$$SDKTARGETSYSROOT/usr/lib64 ;\
 	make CROSS=$$CROSS_COMPILE EXTRA_CFLAGS=" -msse4.2 $$KCFLAGS" LIB_QAT18_DIR=$$OECORE_TARGET_SYSROOT/usr LDFLAGS=" -lies_sdk -lae_client -lrte_pmd_ice_dsi"
- 
+
 $(TOP)/build/samples/data_path_sample_multiFlow/datapath-run.sh:
 	$(ECHO) "modprobe ice_sw" > $@
 	$(ECHO) "modprobe ice_sw_ae" >> $@
