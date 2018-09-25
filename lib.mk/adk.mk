@@ -1,13 +1,15 @@
 
 ADK_DIR=$(TOP)/build/adk
-ADK_TAR=$(REF_ASE_BASE)/adk_source*.tar.gz
+ADK_TAR=$(SNR_ADK_DIR)/adk_source*.tar.gz
 ADK_SRC=$(ADK_DIR)/adk_source.tiger_netd
+ADK_TARGET_DIR=/opt/adk
 
 help:: adk.help
 
 adk.help:
 	$(ECHO) "\n--- adk ----"
-	$(ECHO) " adk-build-apps            : builds adk"
+	$(ECHO) " adk-build-apps            : builds adk examples"
+	$(ECHO) " adk-deploy                : deploys adk examples on target in $(ADK_TARGET_DIR)"
 	$(ECHO) " adk-clean                 : removes $(ADK_DIR) directory"
 
 adk-fetch:
@@ -17,10 +19,22 @@ adk-fetch:
 	fi;
 
 adk-build-apps: adk-fetch
+	$(Q)if [ ! -f $(SDK_ENV) ]; then \
+		echo 'SDK is not installed. Run first "make install-sdk" command.'; \
+	        exit 1; \
+	fi;
 	$(CD) $(ADK_SRC); \
-	source $(TOP)/build/sdk/environment-setup-core2-64-intelaxxia-linux ; \
+	source $(SDK_ENV) ; \
 	export ADK_NETD_ROOT=$(ADK_SRC); \
-	make -C apps; 
+	make -s -C apps;
+	$(RM) -r $(ADK_SRC)/build;
+	$(MKDIR) $(ADK_SRC)/build;
+	$(FIND) $(ADK_SRC)/apps -type f -executable -exec cp {} $(ADK_SRC)/build \;
+
+adk-deploy:
+	$(ECHO) "ADK examples are installed on $(TARGET) in $(ADK_TARGET_DIR) directory."
+	$(SSH_CMD) -- "mkdir -p $(ADK_TARGET_DIR)"
+	$(SCP_CMD)  $(ADK_SRC)/build/*  $(SSH_TARGET):$(ADK_TARGET_DIR)
 
 adk-clean:
 	$(RM) -r $(ADK_DIR)

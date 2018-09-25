@@ -11,7 +11,7 @@ SHELL		?= /bin/bash
 -include $(TOP)/lib.mk/tools.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = 90414ecd5cf72995074f3dc6b05cfbee0a1dab67
+POKY_REL = 9ed1178c87afce997d5a21cadae7461fb6bb48da
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
 OE_REL = 352531015014d1957d6444d114f4451e241c4d23
@@ -26,17 +26,17 @@ VIRT_REL = bd77388f31929f38e7d4cc9c711f0f83f563007e
 LAYERS += $(TOP)/build/layers/meta-virtualization
 
 INTEL_URL=git://git.yoctoproject.org/meta-intel
-INTEL_REL=f66ce51d059d291a441d896854be8db70de5a554
+INTEL_REL=b4d10c37695806143fbaca94eea467ddd27ac7a8
 LAYERS += $(TOP)/build/layers/meta-intel
 
 REL_NR=15.1
-REF_REL_NR= $(firstword $(subst ., ,$(REL_NR)))
 
-SNR_DIR=/wr/installs/ASE/snowridge/$(REL_NR)
-ASE_BASE=$(SNR_DIR)
-
-REF_SNR_DIR=/wr/installs/ASE/snowridge/$(REF_REL_NR)
-REF_ASE_BASE=$(REF_SNR_DIR)
+SNR_BASE=/wr/installs/ASE/snowridge/
+SNR_ADK_DIR=$(SNR_BASE)/15
+SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
+SNR_DPDK_DIR=$(SNR_BASE)/$(REL_NR)
+SNR_RDK_DIR=$(SNR_BASE)/$(REL_NR)
+SNR_SAMPLES_DIR=$(SNR_BASE)/$(REL_NR)/samples/snr
 
 AXXIA_URL=git@github.com:axxia/meta-intel-axxia.git
 AXXIA_REL=snr_delivery$(REL_NR)
@@ -48,12 +48,17 @@ ifeq ($(ENABLE_AXXIA_RDK),yes)
 
 LAYERS += $(TOP)/build/layers/meta-intel-axxia-rdk
 AXXIA_RDK_URL=git@github.com:axxia/meta-intel-axxia-rdk.git
-AXXIA_RDK_KLM=$(SNR_DIR)/rdk_klm_src_*xz
-AXXIA_RDK_USER=$(SNR_DIR)/rdk_user_src_*xz
+AXXIA_RDK_KLM=$(SNR_RDK_DIR)/rdk_klm_src_*xz
+AXXIA_RDK_USER=$(SNR_RDK_DIR)/rdk_user_src_*xz
+
+LAYERS += $(TOP)/build/layers/meta-intel-axxia-adknetd
+AXXIA_ADK_LAYER=$(SNR_ADK_DIR)/adk_meta-intel-axxia-adknetd*.tar.gz
+AXXIA_ADK_SRC=$(SNR_ADK_DIR)/adk_source*.tar.gz
 endif
 
 SDK_FILE=$(TOP)/build/build/tmp/deploy/sdk/intel-axxia-indist-glibc-x86_64-axxia-image-sim*.sh
-AXXIA_RDK_SAMPLES=$(SNR_DIR)/samples/snr
+SDK_ENV=$(TOP)/build/sdk/environment-setup-core2-64-intelaxxia-linux
+AXXIA_RDK_SAMPLES=$(SNR_SAMPLES_DIR)
 
 MACHINE=axxiax86-64
 
@@ -119,6 +124,10 @@ $(TOP)/build/layers/meta-intel-axxia-rdk:
 	cp $(AXXIA_RDK_USER) $@/downloads/rdk_user_src.tar.xz
 	mkdir -p $@/downloads/unpacked
 	tar -C $@/downloads/unpacked -xf $(AXXIA_RDK_KLM)
+
+$(TOP)/build/layers/meta-intel-axxia-adknetd:
+	tar -xzf $(AXXIA_ADK_LAYER) -C $(TOP)/build/layers
+	cp $(AXXIA_ADK_SRC) $@/downloads/adk_source.tiger_netd.tar.gz
 
 .PHONY: extract-rdk-patches
 extract-rdk-patches:
