@@ -29,10 +29,10 @@ INTEL_URL=git://git.yoctoproject.org/meta-intel
 INTEL_REL=b4d10c37695806143fbaca94eea467ddd27ac7a8
 LAYERS += $(TOP)/build/layers/meta-intel
 
-REL_NR=15.1
+REL_NR=15.2
 
 SNR_BASE=/wr/installs/ASE/snowridge/
-SNR_ADK_DIR=$(SNR_BASE)/15
+SNR_ADK_DIR=$(SNR_BASE)/$(REL_NR)
 SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
 SNR_DPDK_DIR=$(SNR_BASE)/$(REL_NR)
 SNR_RDK_DIR=$(SNR_BASE)/$(REL_NR)
@@ -89,10 +89,7 @@ help::
 	$(ECHO) " clean                     : removes any platform build, sample compile or sdk install"
 	$(ECHO) " distclean                 : remove $(TOP)/build directory"
 
--include $(TOP)/lib.mk/dpdk.mk
--include $(TOP)/lib.mk/adk.mk
--include $(TOP)/lib.mk/ase-sample-datapath.mk
--include $(TOP)/lib.mk/sim-ase.mk
+-include $(TOP)/lib.mk/*.mk
 
 $(TOP)/build/poky:
 
@@ -159,6 +156,7 @@ build/build: build $(LAYERS)
 		echo "RELEASE_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
 		echo "PREFERRED_PROVIDER_virtual/kernel = \"linux-yocto\"" >> conf/local.conf ; \
 		echo "PREFERRED_VERSION_linux-yocto = \"4.12%\"" >> conf/local.conf ; \
+		echo "TOOLCHAIN_TARGET_TASK_append += \" kernel-dev kernel-devsrc \""  >> conf/local.conf ; \
 	fi
 
 bbs: build/build
@@ -174,6 +172,7 @@ sdk: build/build
 
 install-sdk:
 	$(SDK_FILE) -y -d $(TOP)/build/sdk
+	$(MAKE) -C $(TOP)/build/sdk/sysroots/core2-64-intelaxxia-linux/usr/src/kernel scripts
 
 esdk: build/build
 	$(call bitbake-task, $(IMAGE), populate_sdk_ext)
