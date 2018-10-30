@@ -11,10 +11,10 @@ SHELL		?= /bin/bash
 -include $(TOP)/lib.mk/tools.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = 9ed1178c87afce997d5a21cadae7461fb6bb48da
+POKY_REL = cd3c8323d855876d55e03eb51b0a5b42830e9473
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
-OE_REL = 352531015014d1957d6444d114f4451e241c4d23
+OE_REL = eae996301d9c097bcbeb8046f08041dc82bb62f8
 LAYERS += $(TOP)/build/layers/meta-openembedded
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-oe
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-python
@@ -22,24 +22,26 @@ LAYERS += $(TOP)/build/layers/meta-openembedded/meta-networking
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-filesystems
 
 VIRT_URL = git://git.yoctoproject.org/meta-virtualization
-VIRT_REL = bd77388f31929f38e7d4cc9c711f0f83f563007e
+VIRT_REL = b704c689b67639214b9568a3d62e82df27e9434f
 LAYERS += $(TOP)/build/layers/meta-virtualization
 
 INTEL_URL=git://git.yoctoproject.org/meta-intel
-INTEL_REL=b4d10c37695806143fbaca94eea467ddd27ac7a8
+INTEL_REL=4ee8ff5ebe0657bd376d7a79703a21ec070ee779
 LAYERS += $(TOP)/build/layers/meta-intel
 
-REL_NR=15.2
+REL_NR=snr_po_rdk0
 
-SNR_BASE=/wr/installs/ASE/snowridge/
-SNR_ADK_DIR=$(SNR_BASE)/$(REL_NR)
-SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
-SNR_DPDK_DIR=$(SNR_BASE)/$(REL_NR)
+#SNR_BASE=/wr/installs/ASE/snowridge/
+SNR_BASE=/wr/installs/snr
+#SNR_ADK_DIR=$(SNR_BASE)/$(REL_NR)
+#SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
+#SNR_DPDK_DIR=$(SNR_BASE)/$(REL_NR)
 SNR_RDK_DIR=$(SNR_BASE)/$(REL_NR)
-SNR_SAMPLES_DIR=$(SNR_BASE)/$(REL_NR)/samples/snr
+SNR_SAMPLES_DIR=$(SNR_BASE)/$(REL_NR)/rdk_samples/samples/snr
 
 AXXIA_URL=git@github.com:axxia/meta-intel-axxia.git
-AXXIA_REL=snr_delivery$(REL_NR)
+AXXIA_REL=$(REL_NR)
+
 LAYERS += $(TOP)/build/layers/meta-intel-axxia/meta-intel-snr
 LAYERS += $(TOP)/build/layers/meta-intel-axxia
 
@@ -51,9 +53,9 @@ AXXIA_RDK_URL=git@github.com:axxia/meta-intel-axxia-rdk.git
 AXXIA_RDK_KLM=$(SNR_RDK_DIR)/rdk_klm_src_*xz
 AXXIA_RDK_USER=$(SNR_RDK_DIR)/rdk_user_src_*xz
 
-LAYERS += $(TOP)/build/layers/meta-intel-axxia-adknetd
-AXXIA_ADK_LAYER=$(SNR_ADK_DIR)/adk_meta-intel-axxia-adknetd*.tar.gz
-AXXIA_ADK_SRC=$(SNR_ADK_DIR)/adk_source*.tar.gz
+#LAYERS += $(TOP)/build/layers/meta-intel-axxia-adknetd
+#AXXIA_ADK_LAYER=$(SNR_ADK_DIR)/adk_meta-intel-axxia-adknetd*.tar.gz
+#AXXIA_ADK_SRC=$(SNR_ADK_DIR)/adk_source*.tar.gz
 endif
 
 SDK_FILE=$(TOP)/build/build/tmp/deploy/sdk/intel-axxia-indist-glibc-x86_64-axxia-image-sim*.sh
@@ -148,7 +150,7 @@ build/build: build $(LAYERS)
 	$(Q)if [ ! -d $@ ]; then \
 		cd build ; \
 		source poky/oe-init-build-env ; \
-		$(foreach layer, $(LAYERS), bitbake-layers add-layer $(layer);) \
+		$(foreach layer, $(LAYERS), bitbake-layers add-layer -F $(layer);) \
 		sed -i s/^MACHINE.*/MACHINE\ =\ \"$(MACHINE)\"/g conf/local.conf ; \
 		echo "DISTRO = \"intel-axxia-indist\"" >> conf/local.conf ; \
 		echo "DISTRO_FEATURES_append = \" userspace\"" >> conf/local.conf ; \
