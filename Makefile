@@ -29,7 +29,7 @@ INTEL_URL=git://git.yoctoproject.org/meta-intel
 INTEL_REL=4ee8ff5ebe0657bd376d7a79703a21ec070ee779
 LAYERS += $(TOP)/build/layers/meta-intel
 
-REL_NR=snr_po_rdk0
+REL_NR=snr_po_rdk1
 
 #SNR_BASE=/wr/installs/ASE/snowridge/
 SNR_BASE=/wr/installs/snr
@@ -153,8 +153,8 @@ build/build: build $(LAYERS)
 		$(foreach layer, $(LAYERS), bitbake-layers add-layer -F $(layer);) \
 		sed -i s/^MACHINE.*/MACHINE\ =\ \"$(MACHINE)\"/g conf/local.conf ; \
 		echo "DISTRO = \"intel-axxia-indist\"" >> conf/local.conf ; \
-		echo "DISTRO_FEATURES_append = \" userspace\"" >> conf/local.conf ; \
-		echo "RUNTARGET = \"simics\"" >> conf/local.conf ; \
+		echo "DISTRO_FEATURES_append = \" rdk-userspace\"" >> conf/local.conf ; \
+		echo "RUNTARGET = \"snr\"" >> conf/local.conf ; \
 		echo "RELEASE_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
 		echo "PREFERRED_PROVIDER_virtual/kernel = \"linux-yocto\"" >> conf/local.conf ; \
 		echo "PREFERRED_VERSION_linux-yocto = \"4.12%\"" >> conf/local.conf ; \
