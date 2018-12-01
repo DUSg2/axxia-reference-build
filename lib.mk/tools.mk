@@ -8,6 +8,7 @@ Q=@
 endif
 
 CD             := $(Q)cd
+CHMOD          := $(Q)chmod
 CP             := $(Q)cp
 ECHO           := $(Q)/bin/echo -e
 FIND           := $(Q)find

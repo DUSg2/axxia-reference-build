@@ -20,7 +20,7 @@ adk-fetch:
 
 adk-build-apps: adk-fetch
 	$(Q)if [ ! -f $(SDK_ENV) ]; then \
-		echo 'SDK is not installed. Run first "make install-sdk" command.'; \
+		echo 'SDK is not installed. Run first "make sdk-install" command.'; \
 	        exit 1; \
 	fi;
 	$(CD) $(ADK_SRC); \
@@ -28,13 +28,14 @@ adk-build-apps: adk-fetch
 	export ADK_NETD_ROOT=$(ADK_SRC); \
 	make -s -C apps;
 	$(RM) -r $(ADK_SRC)/build;
-	$(MKDIR) $(ADK_SRC)/build;
+	$(MKDIR) $(ADK_SRC)/build; 
 	$(FIND) $(ADK_SRC)/apps -type f -executable -exec cp {} $(ADK_SRC)/build \;
 
 adk-deploy:
 	$(ECHO) "ADK examples are installed on $(TARGET) in $(ADK_TARGET_DIR) directory."
 	$(SSH_CMD) -- "mkdir -p $(ADK_TARGET_DIR)"
 	$(SCP_CMD)  $(ADK_SRC)/build/*  $(SSH_TARGET):$(ADK_TARGET_DIR)
+	$(SCP_CMD)  $(TOP)/lib.mk/adk-test.sh $(SSH_TARGET):$(ADK_TARGET_DIR)
 
 adk-clean:
 	$(RM) -r $(ADK_DIR)

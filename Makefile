@@ -1,14 +1,27 @@
-# Reference build of Axxia deliveries
-#
-# Author : Per Hallsmark <per.hallsmark@windriver.com>
-# Repo   : https://github.com/saxofon/axxia-reference-build
-#
-#
-
-TOP 		?= $(shell pwd)
-SHELL		?= /bin/bash
-
 -include $(TOP)/lib.mk/tools.mk
+
+# Default settings
+TOP		:= $(shell pwd)
+SHELL		:= /bin/bash
+HOSTNAME 	?= $(shell hostname)
+USER		?= $(shell whoami)
+
+all: help
+
+help::
+	$(ECHO) "Current useful make targets"
+	$(ECHO) "======================================================="
+	$(ECHO) "\n--- build commands ---"
+	$(ECHO) " image                     : builds a platform"
+	$(ECHO) " clean                     : removes any platform build or samples"
+	$(ECHO) " distclean                 : remove $(TOP)/build directory"
+
+# Optional configuration
+-include hostconfig-$(HOSTNAME).mk
+-include userconfig-$(USER).mk
+
+# Include any additional Makefile components
+-include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
 POKY_REL = 9ed1178c87afce997d5a21cadae7461fb6bb48da
@@ -65,31 +78,16 @@ MACHINE=axxiax86-64
 IMAGE=axxia-image-sim
 
 define bitbake
-	cd build ; \
-	source poky/oe-init-build-env ; \
-	bitbake $(1)
+        cd build ; \
+        source poky/oe-init-build-env ; \
+        bitbake $(1)
 endef
 
 define bitbake-task
-	cd build ; \
-	source poky/oe-init-build-env ; \
-	bitbake $(1) -c $(2)
+        cd build ; \
+        source poky/oe-init-build-env ; \
+        bitbake $(1) -c $(2)
 endef
-
-all: help
-
-help::
-	$(ECHO) "Current useful make targets"
-	$(ECHO) "======================================================="
-	$(ECHO) "\n--- build commands ---"
-	$(ECHO) " fs                     : builds a platform"
-	$(ECHO) " sdk                       : builds a sdk"
-	$(ECHO) " esdk                      : builds a esdk"
-	$(ECHO) " install-sdk               : installs the sdk"
-	$(ECHO) " clean                     : removes any platform build, sample compile or sdk install"
-	$(ECHO) " distclean                 : remove $(TOP)/build directory"
-
--include $(TOP)/lib.mk/*.mk
 
 $(TOP)/build/poky:
 
@@ -132,15 +130,14 @@ extract-rdk-patches:
 	git -C build/build/tmp/work-shared/axxiax86-64/kernel-source format-patch -o $(TOP)/build/extracted-rdk-patches before_rdk_commits..after_rdk_commits
 endif
 
-# create wrlinux platform
 .PHONY: build
 build:
 	$(Q)if [ ! -d $@ ]; then \
-		mkdir -p $@/layers ; \
-		cd $@ ; \
-		git clone $(POKY_URL) ; \
-		git -C poky checkout $(POKY_REL) ; \
-	fi
+                mkdir -p $@/layers ; \
+                cd $@ ; \
+                git clone $(POKY_URL) ; \
+                git -C poky checkout $(POKY_REL) ; \
+        fi
 
 # create bitbake build
 .PHONY: build/build
@@ -148,7 +145,7 @@ build/build: build $(LAYERS)
 	$(Q)if [ ! -d $@ ]; then \
 		cd build ; \
 		source poky/oe-init-build-env ; \
-		$(foreach layer, $(LAYERS), bitbake-layers add-layer $(layer);) \
+		$(foreach layer, $(LAYERS), bitbake-layers add-layer -F $(layer);) \
 		sed -i s/^MACHINE.*/MACHINE\ =\ \"$(MACHINE)\"/g conf/local.conf ; \
 		echo "DISTRO = \"intel-axxia-indist\"" >> conf/local.conf ; \
 		echo "DISTRO_FEATURES_append = \" userspace\"" >> conf/local.conf ; \
@@ -157,6 +154,9 @@ build/build: build $(LAYERS)
 		echo "PREFERRED_PROVIDER_virtual/kernel = \"linux-yocto\"" >> conf/local.conf ; \
 		echo "PREFERRED_VERSION_linux-yocto = \"4.12%\"" >> conf/local.conf ; \
 		echo "TOOLCHAIN_TARGET_TASK_append += \" kernel-dev kernel-devsrc \""  >> conf/local.conf ; \
+		if [ $(SSTATE_MIRROR_DIR) ]; then \
+			echo "SSTATE_MIRRORS ?= \"file://.* file://$(SSTATE_MIRROR_DIR)PATH\"" >> conf/local.conf; \
+		fi \
 	fi
 
 bbs: build/build
@@ -164,21 +164,12 @@ bbs: build/build
 	source poky/oe-init-build-env ; \
 	bash
 
-fs: build/build
+image: build/build
 	$(call bitbake, $(IMAGE))
-
-sdk: build/build
-	$(call bitbake-task, $(IMAGE), populate_sdk)
-
-install-sdk:
-	$(SDK_FILE) -y -d $(TOP)/build/sdk
-	$(MAKE) -C $(TOP)/build/sdk/sysroots/core2-64-intelaxxia-linux/usr/src/kernel scripts
-
-esdk: build/build
-	$(call bitbake-task, $(IMAGE), populate_sdk_ext)
 
 clean:
 	$(RM) -r build/build
 
 distclean:
 	$(RM) -r build
+
