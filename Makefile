@@ -24,35 +24,41 @@ help::
 -include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = 9ed1178c87afce997d5a21cadae7461fb6bb48da
+POKY_REL = 8883ee32f2a77bf532832d4fad5c20912a1a3630
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
-OE_REL = 352531015014d1957d6444d114f4451e241c4d23
+OE_REL = eae996301d9c097bcbeb8046f08041dc82bb62f8
 LAYERS += $(TOP)/build/layers/meta-openembedded
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-oe
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-python
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-networking
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-filesystems
+LAYERS += $(TOP)/build/layers/meta-openembedded/meta-perl
 
 VIRT_URL = git://git.yoctoproject.org/meta-virtualization
-VIRT_REL = bd77388f31929f38e7d4cc9c711f0f83f563007e
+VIRT_REL = b704c689b67639214b9568a3d62e82df27e9434f
 LAYERS += $(TOP)/build/layers/meta-virtualization
 
 INTEL_URL=git://git.yoctoproject.org/meta-intel
-INTEL_REL=b4d10c37695806143fbaca94eea467ddd27ac7a8
+INTEL_REL=4ee8ff5ebe0657bd376d7a79703a21ec070ee779
 LAYERS += $(TOP)/build/layers/meta-intel
 
-REL_NR=15.2
+SECUR_URL = https://git.yoctoproject.org/git/meta-security
+SECUR_REL = 74860b2b61afd033fba130044ae66567ead57aaf
+LAYERS += $(TOP)/build/layers/meta-security
+LAYERS += $(TOP)/build/layers/meta-security/meta-tpm
 
-SNR_BASE=/wr/installs/ASE/snowridge/
+REL_NR=snr_po_rdk2
+
+SNR_BASE=/wr/installs/snr
 SNR_ADK_DIR=$(SNR_BASE)/$(REL_NR)
 SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
 SNR_DPDK_DIR=$(SNR_BASE)/$(REL_NR)
 SNR_RDK_DIR=$(SNR_BASE)/$(REL_NR)
-SNR_SAMPLES_DIR=$(SNR_BASE)/$(REL_NR)/samples/snr
+SNR_SAMPLES_DIR=$(SNR_BASE)/$(REL_NR)/rdk_samples/samples/snr
 
 AXXIA_URL=git@github.com:axxia/meta-intel-axxia.git
-AXXIA_REL=snr_delivery$(REL_NR)
+AXXIA_REL=$(REL_NR)
 LAYERS += $(TOP)/build/layers/meta-intel-axxia/meta-intel-snr
 LAYERS += $(TOP)/build/layers/meta-intel-axxia
 
@@ -63,19 +69,15 @@ LAYERS += $(TOP)/build/layers/meta-intel-axxia-rdk
 AXXIA_RDK_URL=git@github.com:axxia/meta-intel-axxia-rdk.git
 AXXIA_RDK_KLM=$(SNR_RDK_DIR)/rdk_klm_src_*xz
 AXXIA_RDK_USER=$(SNR_RDK_DIR)/rdk_user_src_*xz
-
-LAYERS += $(TOP)/build/layers/meta-intel-axxia-adknetd
-AXXIA_ADK_LAYER=$(SNR_ADK_DIR)/adk_meta-intel-axxia-adknetd*.tar.gz
-AXXIA_ADK_SRC=$(SNR_ADK_DIR)/adk_source*.tar.gz
 endif
 
-SDK_FILE=$(TOP)/build/build/tmp/deploy/sdk/intel-axxia-indist-glibc-x86_64-axxia-image-sim*.sh
+SDK_FILE=$(TOP)/build/build/tmp/deploy/sdk/intel-axxia-indist-glibc-x86_64-axxia-image-vcn*.sh
 SDK_ENV=$(TOP)/build/sdk/environment-setup-core2-64-intelaxxia-linux
 AXXIA_RDK_SAMPLES=$(SNR_SAMPLES_DIR)
 
 MACHINE=axxiax86-64
 
-IMAGE=axxia-image-sim
+IMAGE=axxia-image-vcn
 
 define bitbake
         cd build ; \
@@ -107,6 +109,10 @@ $(TOP)/build/layers/meta-intel-axxia:
 	git -C $(TOP)/build/layers clone $(AXXIA_URL) $@
 	git -C $@ checkout $(AXXIA_REL)
 
+$(TOP)/build/layers/meta-security:
+	git -C $(TOP)/build/layers clone $(SECUR_URL) $@
+	git -C $@ checkout $(SECUR_REL)
+
 $(TOP)/build/layers/meta-intel-axxia/meta-intel-snr: $(TOP)/build/layers/meta-intel-axxia
 
 ifeq ($(ENABLE_AXXIA_RDK),yes)
@@ -120,9 +126,6 @@ $(TOP)/build/layers/meta-intel-axxia-rdk:
 	mkdir -p $@/downloads/unpacked
 	tar -C $@/downloads/unpacked -xf $(AXXIA_RDK_KLM)
 
-$(TOP)/build/layers/meta-intel-axxia-adknetd:
-	tar -xzf $(AXXIA_ADK_LAYER) -C $(TOP)/build/layers
-	cp $(AXXIA_ADK_SRC) $@/downloads/adk_source.tiger_netd.tar.gz
 
 .PHONY: extract-rdk-patches
 extract-rdk-patches:
@@ -148,8 +151,8 @@ build/build: build $(LAYERS)
 		$(foreach layer, $(LAYERS), bitbake-layers add-layer -F $(layer);) \
 		sed -i s/^MACHINE.*/MACHINE\ =\ \"$(MACHINE)\"/g conf/local.conf ; \
 		echo "DISTRO = \"intel-axxia-indist\"" >> conf/local.conf ; \
-		echo "DISTRO_FEATURES_append = \" userspace\"" >> conf/local.conf ; \
-		echo "RUNTARGET = \"simics\"" >> conf/local.conf ; \
+		echo "DISTRO_FEATURES_append = \" rdk-userspace\"" >> conf/local.conf ; \
+		echo "RUNTARGET = \"snr\"" >> conf/local.conf ; \
 		echo "RELEASE_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
 		echo "PREFERRED_PROVIDER_virtual/kernel = \"linux-yocto\"" >> conf/local.conf ; \
 		echo "PREFERRED_VERSION_linux-yocto = \"4.12%\"" >> conf/local.conf ; \
