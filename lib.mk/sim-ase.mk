@@ -25,8 +25,8 @@ export SIMICS_LICENSE_FEATURE=axxia_embed
 
 # WindRiver stuff
 BUILD_DIR=$(TOP)/build
-SATADISK=$(BUILD_DIR)/build/tmp/deploy/images/axxiax86-64/axxia-image-sim-axxiax86-64.hddimg
-USBDISK=$(BUILD_DIR)/build/tmp/deploy/images/axxiax86-64/axxia-image-sim-axxiax86-64.ext4
+SATADISK=$(BUILD_DIR)/build/tmp/deploy/images/axxiax86-64/axxia-image-vcn-axxiax86-64.hddimg
+USBDISK=$(BUILD_DIR)/build/tmp/deploy/images/axxiax86-64/axxia-image-vcn-axxiax86-64.ext4
 PLATFORM=$(BUILD_DIR)/ase-sim
 
 help:: sim-ase.help

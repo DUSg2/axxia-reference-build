@@ -24,7 +24,7 @@ help::
 -include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = 8883ee32f2a77bf532832d4fad5c20912a1a3630
+POKY_REL = 68a612b7d31d270348ef5439d7f779c309bdb6ec
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
 OE_REL = eae996301d9c097bcbeb8046f08041dc82bb62f8
@@ -48,7 +48,7 @@ SECUR_REL = 74860b2b61afd033fba130044ae66567ead57aaf
 LAYERS += $(TOP)/build/layers/meta-security
 LAYERS += $(TOP)/build/layers/meta-security/meta-tpm
 
-REL_NR=snr_po_rdk2
+REL_NR=snr_combined_ase_rdk3
 
 SNR_BASE=/wr/installs/snr
 SNR_ADK_DIR=$(SNR_BASE)/$(REL_NR)
