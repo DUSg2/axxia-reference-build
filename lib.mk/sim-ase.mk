@@ -25,19 +25,20 @@ export SIMICS_LICENSE_FEATURE=axxia_embed
 
 # WindRiver stuff
 BUILD_DIR=$(TOP)/build
-SATADISK=$(BUILD_DIR)/build/tmp/deploy/images/axxiax86-64/axxia-image-vcn-axxiax86-64.hddimg
-USBDISK=$(BUILD_DIR)/build/tmp/deploy/images/axxiax86-64/axxia-image-vcn-axxiax86-64.ext4
+SATADISK=$(BUILD_DIR)/build/tmp/deploy/images/$(MACHINE)/$(IMAGE)-$(MACHINE).hddimg
+USBDISK=$(BUILD_DIR)/build/tmp/deploy/images/$(MACHINE)/$(IMAGE)-$(MACHINE).ext4
 PLATFORM=$(BUILD_DIR)/ase-sim
 
 help:: sim-ase.help
 
 sim-ase.help:
 	$(ECHO) "\n--- sim-ase ---"
-	$(ECHO) " sim-update RDK_SAMPLE=sample : Update all files used by the simulator inside build/ase-sim directory (SNR BIOS binary and the USB/SATA disk images from the WRL build),"
-	$(ECHO) "                                topology.xml and tester.xml templates are based from default rdk-sample: data_path_sample_multiFlow,"
-	$(ECHO) "                                run 'make rdk-samples-list', to see available rdk-samples which can be used with sim-ase."
-	$(ECHO) " sim-run                      : Run the simulator, using the files from build/ase-sim directory and connect to the simulator using telnet."
-	$(ECHO) " sim-stop                     : Stop the simulator."
+	$(ECHO) " sim-update RDK_SAMPLE=sample 	: Update all files used by the simulator inside build/ase-sim directory (SNR BIOS binary and the USB/SATA disk images from the WRL build),"
+	$(ECHO) "                                   topology.xml and tester.xml templates are based from default rdk-sample: data_path_sample_multiFlow,"
+	$(ECHO) "                                   run 'make rdk-samples-list', to see available rdk-samples which can be used with sim-ase."
+	$(ECHO) " sim-run                      	: Run the simulator, using the files from build/ase-sim directory and connect to the simulator using telnet."
+	$(ECHO) " sim-run-interactive	       	: Run the simulator in interactive mode (dropping to ASE python shell)"
+	$(ECHO) " sim-stop                     	: Stop the simulator."
 
 sim-samples: rdk-samples-list
 
@@ -70,7 +71,7 @@ sim-start:
 		exit 1; \
 	fi
 
-sim-interactive:
+sim-run-interactive:
 	$(Q)if [ ! -d $(PLATFORM) ] || [ ! -f $(PLATFORM)/$(shell basename $(BIOS)) ] || [ ! -f $(PLATFORM)/$(shell basename $(SATADISK)) ] || \
 	[ ! -f $(PLATFORM)/$(shell basename $(USBDISK)) ] || [ ! -f $(PLATFORM)/$(shell basename $(TOPOLOGY)) ] ; then \
 		echo "You are missing a required file, please run \"make sim-update\" first." ; \
@@ -88,7 +89,7 @@ sim-interactive:
 sim-connect:
 	$(ECHO) "Waiting to get telnet port..." ; \
 	TIMEOUT=0; while [ -z $$TELNET_PORT ] && [ $$TIMEOUT -lt 120 ] ; do \
-		TELNET_PORT=$$(grep "Telnet console listening to port" $(PLATFORM)/ase.sim.log 2>/dev/null | sed 's/[^0-9]*//g') ; \
+		TELNET_PORT=$$(grep -m 1 "Telnet console listening to port" $(PLATFORM)/ase.sim.log 2>/dev/null | sed 's/[^0-9]*//g') ; \
 		TIMEOUT=$$(($$TIMEOUT+5)) ; \
 		echo "." ; \
 		sleep 5 ; \
@@ -108,7 +109,7 @@ sim-stop:
 		if [ "$$ASE_PID" != "" ]; then \
 			ASE_GPID=$$(ps -o pid,pgid -U $$USER | grep $$ASE_PID | awk '{print $$2}'); \
 			echo "Stopping all asesim related processes having GPID:$$ASE_GPID"; \
-			pkill -9 -g $$ASE_GPID || echo "Process was already stopped."; \
+			pkill -9 -g $$ASE_GPID 2>/dev/null || echo "Process was already stopped."; \
 		fi; \
 		rm $(PLATFORM)/ase.sim.pid ; \
 	fi

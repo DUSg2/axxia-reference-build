@@ -12,10 +12,10 @@ help:: rdk-samples.help
 
 rdk-samples.help:
 	$(ECHO) "\n--- rdk-samples ---"
-	$(ECHO) " rdk-samples-list          : print a list of available rdk-samples"
-	$(ECHO) " rdk-samples-build         : build all rdk-samples"
-	$(ECHO) " rdk-samples-deploy        : deploy rdk-samples on target in $(SAMPLES_TARGET_DIR) directory"
-	$(ECHO) " rdk-samples-clean         : remove $(SAMPLES_BUILD_DIR) directory"
+	$(ECHO) " rdk-samples-list          	: print a list of available rdk-samples"
+	$(ECHO) " rdk-samples-build         	: build all rdk-samples"
+	$(ECHO) " rdk-samples-deploy        	: deploy rdk-samples on target in $(SAMPLES_TARGET_DIR) directory"
+	$(ECHO) " rdk-samples-clean         	: remove $(SAMPLES_BUILD_DIR) directory"
 
 rdk-samples-list:
 	$(ECHO) List of rdk-samples to build is: $(RDK_SAMPLES)

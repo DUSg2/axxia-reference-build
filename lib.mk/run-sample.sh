@@ -44,7 +44,7 @@ echo 256 > /proc/sys/vm/nr_hugepages
 run_datapath() 
 {	
 	# Testcase setup
-	drivers=("ice_sw" "ice_sw_ae" "ies" "hqm")
+	drivers=("uio" "ice_sw" "ice_sw_ae" "ies" "hqm")
 	for i in "${drivers[@]}"
 	do
 	    load_driver $i
@@ -52,7 +52,7 @@ run_datapath()
 	done
 	echo "[Info] starting data_path_sample_multiFlow sample"
 	sleep 5
-	/opt/rdk-samples/data_path_sample_multiFlow -n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,tx_mode=advanced,cmpltnq=1 --vdev=event_ihqm --lcores '(0-4)@0' -- -t 22
+	/opt/rdk-samples/data_path_sample_multiFlow -n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,tx_mode=advanced,cmpltnq=1 --vdev=event_ihqm --lcores '(0-4)@0' -- -t 1 -p 0=10G
 }
 
 run_crypto_inline()
@@ -85,11 +85,11 @@ run_crypto_lookaside()
 	adf_ctl down
 	adf_ctl up
 	
-	lspci -n | grep 18ee || { echo "can't find qat device" && exit 1 ; }
+	lspci -n | grep 18a0 || { echo "can't find qat device" && exit 1 ; }
 		
-	bus=$( lspci -n | grep 18ee | cut -b 1-2 )
-	device=$( lspci -n | grep 18ee | cut -b 4-5 )
-	function=$( lspci -n | grep 18ee | cut -b 7 )
+	bus=$( lspci -n | grep 18a0 | cut -b 1-2 )
+	device=$( lspci -n | grep 18a0 | cut -b 4-5 )
+	function=$( lspci -n | grep 18a0 | cut -b 7 )
 
 	pci_sysfs=$( find /sys/devices/ -name "*$bus\:$device\.$function*" )
 	
@@ -100,6 +100,7 @@ run_crypto_lookaside()
 	echo "[Info] starting crypto_lookaside sample"
 	sleep 5
 	/opt/rdk-samples/crypto_lookaside -n 4 -w 0000:$bus:$device.1 -w 0000:$bus:$device.2 -w 0000:$bus:$device.3 -w 0000:$bus:$device.4 -w 0000:$bus:$device.5 -w 0000:$bus:$device.6 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21 --vdev=event_ihqm --lcores '(0-4)@0' -- -t 21 -p 6
+	/opt/rdk-samples/crypto_lookaside -n 4 -w 0000:$bus:$device.1 -w 0000:$bus:$device.2 -w 0000:$bus:$device.3 -w 0000:$bus:$device.4 -w 0000:$bus:$device.5 -w 0000:$bus:$device.6 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21 --vdev=event_ihqm --lcores '(0-4)@0' -- -t 13 -c 1 -p 0=10G -p 1=10G -p 2=10G -p 3=10G -p 4=10G -p 5=10G -p 6=10G -p 7=10G -p 8=10G -p 9=10G -p 10=10G -p 11=10G
 
 }
 

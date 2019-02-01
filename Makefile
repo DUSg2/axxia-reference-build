@@ -24,7 +24,7 @@ help::
 -include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = 68a612b7d31d270348ef5439d7f779c309bdb6ec
+POKY_REL = c3dd2826dd1cd940203609133ecea58ef450d813
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
 OE_REL = eae996301d9c097bcbeb8046f08041dc82bb62f8
@@ -48,14 +48,14 @@ SECUR_REL = 74860b2b61afd033fba130044ae66567ead57aaf
 LAYERS += $(TOP)/build/layers/meta-security
 LAYERS += $(TOP)/build/layers/meta-security/meta-tpm
 
-REL_NR=snr_combined_ase_rdk3
+REL_NR=snr_combined_ase_rdk4
 
 SNR_BASE=/wr/installs/snr
 SNR_ADK_DIR=$(SNR_BASE)/$(REL_NR)
 SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
 SNR_DPDK_DIR=$(SNR_BASE)/$(REL_NR)
 SNR_RDK_DIR=$(SNR_BASE)/$(REL_NR)
-SNR_SAMPLES_DIR=$(SNR_BASE)/$(REL_NR)/rdk_samples/samples/snr
+SNR_SAMPLES_DIR=$(SNR_BASE)/$(REL_NR)/samples/snr
 
 AXXIA_URL=git@github.com:axxia/meta-intel-axxia.git
 AXXIA_REL=$(REL_NR)
@@ -69,10 +69,13 @@ LAYERS += $(TOP)/build/layers/meta-intel-axxia-rdk
 AXXIA_RDK_URL=git@github.com:axxia/meta-intel-axxia-rdk.git
 AXXIA_RDK_KLM=$(SNR_RDK_DIR)/rdk_klm_src_*xz
 AXXIA_RDK_USER=$(SNR_RDK_DIR)/rdk_user_src_*xz
+
+LAYERS += $(TOP)/build/layers/meta-intel-axxia-adknetd
+AXXIA_ADK_LAYER=$(SNR_ADK_DIR)/adk_meta-intel-axxia-adknetd*.tar.gz
+AXXIA_ADK_SRC=$(SNR_ADK_DIR)/adk_source*.tar.gz
+
 endif
 
-SDK_FILE=$(TOP)/build/build/tmp/deploy/sdk/intel-axxia-indist-glibc-x86_64-axxia-image-vcn*.sh
-SDK_ENV=$(TOP)/build/sdk/environment-setup-core2-64-intelaxxia-linux
 AXXIA_RDK_SAMPLES=$(SNR_SAMPLES_DIR)
 
 MACHINE=axxiax86-64
@@ -126,6 +129,10 @@ $(TOP)/build/layers/meta-intel-axxia-rdk:
 	mkdir -p $@/downloads/unpacked
 	tar -C $@/downloads/unpacked -xf $(AXXIA_RDK_KLM)
 
+$(TOP)/build/layers/meta-intel-axxia-adknetd:
+	tar -xzf $(AXXIA_ADK_LAYER) -C $(TOP)/build/layers
+	cp $(AXXIA_ADK_SRC) $@/downloads/adk_source.tiger_netd.tar.gz
+
 
 .PHONY: extract-rdk-patches
 extract-rdk-patches:
@@ -154,9 +161,10 @@ build/build: build $(LAYERS)
 		echo "DISTRO_FEATURES_append = \" rdk-userspace\"" >> conf/local.conf ; \
 		echo "RUNTARGET = \"snr\"" >> conf/local.conf ; \
 		echo "RELEASE_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
+		echo "RDK_TOOLS_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
 		echo "PREFERRED_PROVIDER_virtual/kernel = \"linux-yocto\"" >> conf/local.conf ; \
 		echo "PREFERRED_VERSION_linux-yocto = \"4.12%\"" >> conf/local.conf ; \
-		echo "TOOLCHAIN_TARGET_TASK_append += \" kernel-dev kernel-devsrc \""  >> conf/local.conf ; \
+		echo "TOOLCHAIN_TARGET_TASK_append = \" kernel-dev kernel-devsrc\""  >> conf/local.conf ; \
 		if [ $(SSTATE_MIRROR_DIR) ]; then \
 			echo "SSTATE_MIRRORS ?= \"file://.* file://$(SSTATE_MIRROR_DIR)PATH\"" >> conf/local.conf; \
 		fi \

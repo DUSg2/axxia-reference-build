@@ -12,9 +12,9 @@ help:: dpdk.help
 
 dpdk.help:
 	$(ECHO) "\n--- dpdk ----"
-	$(ECHO) " dpdk-build                : build dpdk libraries"
-	$(ECHO) " dpdk-deploy               : deploy dpdk libraries on target in $(DPDK_TARGET_DIR)"
-	$(ECHO) " dpdk-clean                : remove $(DPDK_BUILD_DIR) directory"
+	$(ECHO) " dpdk-build                	: build dpdk libraries"
+	$(ECHO) " dpdk-deploy               	: deploy dpdk libraries on target in $(DPDK_TARGET_DIR)"
+	$(ECHO) " dpdk-clean                	: remove $(DPDK_BUILD_DIR) directory"
 
 
 dpdk-fetch:
@@ -55,7 +55,7 @@ dpdk-deploy:
 	$(SCP_CMD) -r $(DPDK_DIR)/$(RTE_TARGET)/lib $(SSH_TARGET):$(DPDK_TARGET_DIR)
 	$(SCP_CMD) $(DPDK_DIR)/usertools/dpdk-devbind.py $(SSH_TARGET):$(DPDK_TARGET_DIR)/usertools
 	$(SCP_CMD) -r $(DPDK_DIR)/$(RTE_TARGET)/kmod $(SSH_TARGET):$(DPDK_TARGET_DIR)
-	$(SSH_CMD) -- "ln -sf $(DPDK_TARGET_DIR)/lib/* /usr/lib64"
+	$(SSH_CMD) -- "ln -sf $(DPDK_TARGET_DIR)/lib/* /usr/lib"
 
 dpdk-clean:
 	$(RM) -r $(DPDK_BUILD_DIR)

@@ -7,10 +7,10 @@ ADK_TARGET_DIR=/opt/adk
 help:: adk.help
 
 adk.help:
-	$(ECHO) "\n--- adk ----"
-	$(ECHO) " adk-build-apps            : builds adk examples"
-	$(ECHO) " adk-deploy                : deploys adk examples on target in $(ADK_TARGET_DIR)"
-	$(ECHO) " adk-clean                 : removes $(ADK_DIR) directory"
+	$(ECHO) "\n--- adk ----"		
+	$(ECHO) " adk-build-apps         	: builds adk examples"
+	$(ECHO) " adk-deploy			: deploys adk examples on target in $(ADK_TARGET_DIR)"
+	$(ECHO) " adk-clean			: removes $(ADK_DIR) directory"
 
 adk-fetch:
 	$(Q)if [ ! -d $(ADK_SRC) ]; then \
