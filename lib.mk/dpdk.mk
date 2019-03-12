@@ -1,8 +1,7 @@
 
-BRANCH=18.05
-SRCREV = "a5dce55556286cc56655320d975c67b0dbe08693"
+DPDK_REV=v18.11
 DPDK_BUILD_DIR=$(TOP)/build/dpdk-build
-DPDK_DIR=$(DPDK_BUILD_DIR)/rdk_user/dpdk-$(BRANCH)
+DPDK_DIR=$(DPDK_BUILD_DIR)/rdk_user/dpdk-$(subst v,,$(DPDK_REV))
 DPDK_PATCH=$(SNR_DPDK_DIR)/dpdk_diff_snr*.patch
 
 DPDK_TARGET_DIR=/opt/dpdk
@@ -24,10 +23,9 @@ dpdk-fetch:
 	fi;
 	$(Q)if [ ! -d $(DPDK_BUILD_DIR) ]; then \
 		mkdir -p $(DPDK_DIR) ; \
-		cp -r $(SNR_DPDK_DIR)/rdk_user $(DPDK_BUILD_DIR) ; \
-		git clone --single-branch git://dpdk.org/dpdk-stable -b $(BRANCH) $(DPDK_DIR) ; \
+		cp -r $(SNR_DPDK_DIR)/rdk_user/rdk/* $(DPDK_BUILD_DIR)/rdk_user ; \
+		git clone --single-branch git://dpdk.org/dpdk-stable -b $(DPDK_REV) $(DPDK_DIR) ; \
 		cd $(DPDK_DIR) ; \
-		git checkout $(SRCREV) ; \
 		cp $(DPDK_PATCH) $(DPDK_DIR)/dpdk_diff_snr.patch ; \
 		patch -p1 -s < $(DPDK_DIR)/dpdk_diff_snr.patch ; \
 	fi;
