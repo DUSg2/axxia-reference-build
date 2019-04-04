@@ -48,7 +48,7 @@ SECUR_REL = 74860b2b61afd033fba130044ae66567ead57aaf
 LAYERS += $(TOP)/build/layers/meta-security
 LAYERS += $(TOP)/build/layers/meta-security/meta-tpm
 
-REL_NR=snr_ase_rdk5
+REL_NR=snr_ase_rdk5.2
 
 SNR_BASE=/wr/installs/snr
 SNR_ADK_DIR=$(SNR_BASE)/$(REL_NR)
