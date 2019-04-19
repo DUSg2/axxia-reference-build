@@ -69,7 +69,7 @@ run_crypto_inline()
 	load_driver ipsec_inline type=1
 	echo "[Info] starting crypto_inline sample"
 	sleep 5
-	/opt/rdk-samples/crypto_inline -n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,ipsec_enable=1 --lcores '(0-4)@0' -- -t 1
+	/opt/rdk-samples/crypto_inline -n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,ipsec_enable=1 --lcores '(0-4)@0' -- -t 1 -p 0=10G
 }
 
 run_crypto_lookaside()
@@ -99,7 +99,6 @@ run_crypto_lookaside()
 	/opt/dpdk/usertools/dpdk-devbind.py -b igb_uio $bus:00.1 $bus:00.2 $bus:00.3 $bus:00.4 $bus:00.5 $bus:00.6 $bus:00.7 $bus:01.0 $bus:01.1 $bus:01.2
 	echo "[Info] starting crypto_lookaside sample"
 	sleep 5
-	/opt/rdk-samples/crypto_lookaside -n 4 -w 0000:$bus:$device.1 -w 0000:$bus:$device.2 -w 0000:$bus:$device.3 -w 0000:$bus:$device.4 -w 0000:$bus:$device.5 -w 0000:$bus:$device.6 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21 --vdev=event_ihqm --lcores '(0-4)@0' -- -t 21 -p 6
 	/opt/rdk-samples/crypto_lookaside -n 4 -w 0000:$bus:$device.1 -w 0000:$bus:$device.2 -w 0000:$bus:$device.3 -w 0000:$bus:$device.4 -w 0000:$bus:$device.5 -w 0000:$bus:$device.6 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21 --vdev=event_ihqm --lcores '(0-4)@0' -- -t 13 -c 1 -p 0=10G -p 1=10G -p 2=10G -p 3=10G -p 4=10G -p 5=10G -p 6=10G -p 7=10G -p 8=10G -p 9=10G -p 10=10G -p 11=10G
 
 }
@@ -116,6 +115,51 @@ run_portsetmode()
 	sleep 5
 	/opt/rdk-samples/snrPortSetMode -p 10 -s IES_PORT_MODE_ADMIN_PWRDOWN -t 1 -z 1
 	
+}
+
+run_cpu_dsi_lpbk()
+{
+	echo 512 > /proc/sys/vm/nr_hugepages
+	drivers=("uio" "ice_sw" "ice_sw_ae" "ies" "hqm")
+	for i in "${drivers[@]}"
+	do
+		load_driver $i
+		sleep 1
+	done
+	echo "[Info] starting cpu_dsi_lpbk sample"
+	sleep 5
+	/opt/rdk-samples/cpu_dsi_lpbk -n 2 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,tx_mode=advanced,cmpltnq=1 --vdev=event_ihqm --lcores '(0-3)@0' -- -p /opt/rdk-samples/cpu_dsi_traffic.pcap -t 10
+}
+
+run_cpu_inline_lpbk()
+{
+	echo 1024 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
+	drivers=("uio" "ice_sw" "ice_sw_ae" "ies" "hqm")
+	for i in "${drivers[@]}"
+	do
+		load_driver $i
+		sleep 1
+	done
+	sleep 5
+	modprobe authenc
+	modprobe dh_generic
+	qat_drivers=("intel_qat" "qat_c4xxx")
+	for i in "${qat_drivers[@]}"
+	do
+		load_driver $i
+		sleep 1
+	done
+	adf_ctl down
+	adf_ctl up
+	load_driver usdm_drv
+	load_driver ipsec_inline type=1
+	echo "[Info] starting cpu_inline_lpbk sample"
+	sleep 5
+	/opt/rdk-samples/cpu_inline_lpbk -n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,tx_mode=advanced,cmpltnq=1,ipsec_enable=1 --vdev=event_ihqm --lcores '(0-3)@0' -- -p /opt/rdk-samples/ipsec.pcap -t 10 -r /opt/rdk-samples/plaintxt.pcap
+	
+	
+
+
 }
 
 if [ -z $1 ] ; then \
@@ -139,5 +183,7 @@ case ${SAMPLE} in
 	cryptoinline) run_crypto_inline;;
 	cryptolookaside) run_crypto_lookaside;;
 	portsetmode) run_portsetmode;;
+	cpudsilpbk) run_cpu_dsi_lpbk;;
+	cpuinlinelpbk) run_cpu_inline_lpbk;;
 esac
 

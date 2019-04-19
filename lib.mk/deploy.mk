@@ -1,5 +1,6 @@
 TUXLAB=arn-tuxlab.wrs.com
 VLMTOOL=ssh $(TUXLAB) /folk/vlm/commandline/vlmTool
+WRL_BUILD_DEPLOY_DIR = $(BUILD_DIR)/build/tmp/deploy
 
 help:: deploy.help
 
@@ -20,9 +21,15 @@ deploy.vlm: vlm-check-id
 	$(ECHO) "Powering target off"
 	@$(VLMTOOL) turnOff -t $(VLM_ID)
 	$(ECHO) "Transfering kernel to vlm server"
-	@scp $(TOP)/build/build/tmp-glibc/deploy/images/$(MACHINE)/bzImage $(TUXLAB):
+ifeq ($(SNR_RELEASE),)
+	@scp $(WRL_BUILD_DEPLOY_DIR)/images/$(MACHINE)/bzImage $(TUXLAB):
 	$(ECHO) "Transfering rootfs to vlm server"
-	@scp $(TOP)/build/build/tmp-glibc/deploy/images/$(MACHINE)/$(IMAGE)-$(MACHINE).tar.bz2 $(TUXLAB):
+	@scp $(WRL_BUILD_DEPLOY_DIR)/images/$(MACHINE)/$(IMAGE)-$(MACHINE).tar.bz2 $(TUXLAB):
+else
+	@scp $(SNR_REL_DIR)/$(SNR_RELEASE)/bzImage $(TUXLAB):
+	$(ECHO) "Transfering rootfs to vlm server"
+	@scp $(SNR_REL_DIR)/$(SNR_RELEASE)/$(IMAGE)-$(MACHINE).tar.bz2 $(TUXLAB):
+endif
 	$(ECHO) "Setting up VLM with new kernel/rootfs"
 	@$(VLMTOOL) copyFile -t $(VLM_ID) -k \~/bzImage -r \~/$(IMAGE)-$(MACHINE).tar.bz2
 	$(ECHO) "Powering target on"

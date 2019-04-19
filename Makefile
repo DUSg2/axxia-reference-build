@@ -24,10 +24,10 @@ help::
 -include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = c3dd2826dd1cd940203609133ecea58ef450d813
+POKY_REL = faeb366bc3eb322f5f203cfe08dc4cf529a822e9
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
-OE_REL = eae996301d9c097bcbeb8046f08041dc82bb62f8
+OE_REL = 4cd3a39f22a2712bfa8fc657d09fe2c7765a4005
 LAYERS += $(TOP)/build/layers/meta-openembedded
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-oe
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-python
@@ -36,19 +36,19 @@ LAYERS += $(TOP)/build/layers/meta-openembedded/meta-filesystems
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-perl
 
 VIRT_URL = git://git.yoctoproject.org/meta-virtualization
-VIRT_REL = b704c689b67639214b9568a3d62e82df27e9434f
+VIRT_REL = 9e8c0c96b443828a255e7d6ca6291598347672ac
 LAYERS += $(TOP)/build/layers/meta-virtualization
 
 INTEL_URL=git://git.yoctoproject.org/meta-intel
-INTEL_REL=4ee8ff5ebe0657bd376d7a79703a21ec070ee779
+INTEL_REL=27dadcfc7bc0de70328b02fecb841608389d22fc
 LAYERS += $(TOP)/build/layers/meta-intel
 
 SECUR_URL = https://git.yoctoproject.org/git/meta-security
-SECUR_REL = 74860b2b61afd033fba130044ae66567ead57aaf
+SECUR_REL = 31dc4e7532fa7a82060e0b50e5eb8d0414aa7e93
 LAYERS += $(TOP)/build/layers/meta-security
 LAYERS += $(TOP)/build/layers/meta-security/meta-tpm
 
-REL_NR=snr_ase_rdk5.2
+REL_NR=snr_ase_rdk_1904
 
 SNR_BASE=/wr/installs/snr
 SNR_ADK_DIR=$(SNR_BASE)/$(REL_NR)
@@ -60,7 +60,7 @@ SNR_SAMPLES_DIR=$(SNR_BASE)/$(REL_NR)/samples/snr
 AXXIA_URL=git@github.com:axxia/meta-intel-axxia.git
 AXXIA_REL=$(REL_NR)
 LAYERS += $(TOP)/build/layers/meta-intel-axxia/meta-intel-snr
-LAYERS += $(TOP)/build/layers/meta-intel-axxia
+LAYERS += $(TOP)/build/layers/meta-intel-axxia/meta-intel-axxia
 
 ENABLE_AXXIA_RDK=yes
 ifeq ($(ENABLE_AXXIA_RDK),yes)

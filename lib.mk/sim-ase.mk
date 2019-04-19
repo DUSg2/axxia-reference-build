@@ -2,6 +2,7 @@
 
 RDK_SAMPLE ?= data_path_sample_multiFlow
 
+ifeq ($(SNR_RELEASE),)
 
 ifeq ($(RDK_SAMPLE),crypto_lookaside)
 TOPOLOGY_TEMPLATE=$(SNR_SAMPLES_DIR)/$(RDK_SAMPLE)/snr_ase_project/topology.xml
@@ -14,9 +15,29 @@ TOPOLOGY_TEMPLATE=$(SNR_SAMPLES_DIR)/$(RDK_SAMPLE)/topology.xml
 TRAFFIC_TEMPLATE=$(SNR_SAMPLES_DIR)/$(RDK_SAMPLE)/tester.xml
 endif
 
+SATADISK=$(WRL_BUILD_DEPLOY_DIR)/images/$(MACHINE)/$(IMAGE)-$(MACHINE).hddimg
+USBDISK=$(WRL_BUILD_DEPLOY_DIR)/images/$(MACHINE)/$(IMAGE)-$(MACHINE).ext4
+BIOS=$(SNR_ASE_DIR)/images/snr_bios.bin
+
+else
+ifeq ($(RDK_SAMPLE),crypto_lookaside)
+TOPOLOGY_TEMPLATE=$(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/$(RDK_SAMPLE)/snr_ase_project/topology.xml
+TRAFFIC_TEMPLATE=$(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/$(RDK_SAMPLE)/snr_ase_project/tester.xml
+else ifeq ($(RDK_SAMPLE),PortSetMode)
+TOPOLOGY_TEMPLATE=$(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/$(RDK_SAMPLE)/aseProj/topology.xml
+TRAFFIC_TEMPLATE=$(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/$(RDK_SAMPLE)/aseProj/tester.xml
+else
+TOPOLOGY_TEMPLATE=$(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/$(RDK_SAMPLE)/topology.xml
+TRAFFIC_TEMPLATE=$(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/$(RDK_SAMPLE)/tester.xml
+endif
+
+SATADISK=$(SNR_REL_DIR)/$(SNR_RELEASE)/$(IMAGE)-$(MACHINE).hddimg
+USBDISK=$(SNR_REL_DIR)/$(SNR_RELEASE)/$(IMAGE)-$(MACHINE).ext4
+BIOS=$(SNR_REL_DIR)/$(SNR_RELEASE)/snr_bios.bin
+endif
+
 TOPOLOGY=topology.xml
 TRAFFIC=tester.xml
-BIOS=$(SNR_ASE_DIR)/images/snr_bios.bin
 ASESIM=$(SNR_ASE_DIR)/asesim
 
 export LM_LICENSE_FILE=$(WIND_INSTALL_BASE)/ASE/snowridge/licenses/simics-axxia-wr.lic
@@ -25,8 +46,6 @@ export SIMICS_LICENSE_FEATURE=axxia_embed
 
 # WindRiver stuff
 BUILD_DIR=$(TOP)/build
-SATADISK=$(BUILD_DIR)/build/tmp/deploy/images/$(MACHINE)/$(IMAGE)-$(MACHINE).hddimg
-USBDISK=$(BUILD_DIR)/build/tmp/deploy/images/$(MACHINE)/$(IMAGE)-$(MACHINE).ext4
 PLATFORM=$(BUILD_DIR)/ase-sim
 
 help:: sim-ase.help
@@ -45,7 +64,10 @@ sim-samples: rdk-samples-list
 sim-update:
 	$(MKDIR) $(PLATFORM) ;
 	$(SCP) $(TOPOLOGY_TEMPLATE) $(PLATFORM) ;
+ifeq (,$(filter $(RDK_SAMPLE),cpu_dsi_lpbk cpu_inline_lpbk))
 	$(SCP) $(TRAFFIC_TEMPLATE) $(PLATFORM) ;
+else
+endif
 	$(SCP) $(BIOS) $(PLATFORM) ;
 	$(SCP) $(SATADISK) $(PLATFORM) ;
 	$(SCP) $(USBDISK) $(PLATFORM) ;
@@ -89,7 +111,7 @@ sim-run-interactive:
 sim-connect:
 	$(ECHO) "Waiting to get telnet port..." ; \
 	TIMEOUT=0; while [ -z $$TELNET_PORT ] && [ $$TIMEOUT -lt 120 ] ; do \
-		TELNET_PORT=$$(grep -m 1 "Telnet console listening to port" $(PLATFORM)/ase.sim.log 2>/dev/null | sed 's/[^0-9]*//g') ; \
+		TELNET_PORT=$$(grep -m 1 -a "Telnet console listening to port" $(PLATFORM)/ase.sim.log 2>/dev/null | sed 's/[^0-9]*//g') ; \
 		TIMEOUT=$$(($$TIMEOUT+5)) ; \
 		echo "." ; \
 		sleep 5 ; \

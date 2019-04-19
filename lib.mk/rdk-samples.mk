@@ -4,9 +4,12 @@ RTE_TARGET=x86_64-native-linuxapp-gcc
 DPDK_DIR=$(TOP)/build/dpdk-build/rdk_user/dpdk-$(BRANCH)
 
 RDK_SAMPLES=crypto_inline \
-	    crypto_lookaside \
-	    data_path_sample_multiFlow \
-	    PortSetMode
+	crypto_lookaside \
+	data_path_sample_multiFlow \
+	PortSetMode \
+	cpu_dsi_lpbk \
+	cpu_inline_lpbk
+	
 
 help:: rdk-samples.help
 
@@ -57,13 +60,29 @@ rdk-samples-install:
 		cp $(SAMPLES_BUILD_DIR)/crypto_lookaside/build/snr_test $(SAMPLES_BUILD_DIR)/build/crypto_lookaside; \
 		cp $(SAMPLES_BUILD_DIR)/data_path_sample_multiFlow/build/snr_test  $(SAMPLES_BUILD_DIR)/build/data_path_sample_multiFlow; \
 		cp $(SAMPLES_BUILD_DIR)/PortSetMode/snrPortSetMode $(SAMPLES_BUILD_DIR)/build/snrPortSetMode ; \
+		cp $(SAMPLES_BUILD_DIR)/cpu_dsi_lpbk/build/snr_test $(SAMPLES_BUILD_DIR)/build/cpu_dsi_lpbk ; \
+		cp $(SAMPLES_BUILD_DIR)/cpu_dsi_lpbk/*.pcap $(SAMPLES_BUILD_DIR)/build ; \
+		cp $(SAMPLES_BUILD_DIR)/cpu_inline_lpbk/build/snr_test $(SAMPLES_BUILD_DIR)/build/cpu_inline_lpbk ; \
+		cp $(SAMPLES_BUILD_DIR)/cpu_inline_lpbk/*.pcap $(SAMPLES_BUILD_DIR)/build ; \
 	fi;
 
 rdk-samples-deploy: rdk-samples-install
 	$(ECHO) "ASE-sample are installed on $(TARGET) in $(SAMPLES_TARGET_DIR) directory."
 	$(SSH_CMD) -- "mkdir -p $(SAMPLES_TARGET_DIR)"
+ifeq ($(SNR_RELEASE),)
 	$(SCP_CMD)  $(SAMPLES_BUILD_DIR)/build/*  $(SSH_TARGET):$(SAMPLES_TARGET_DIR)
 	$(SCP_CMD) $(TOP)/lib.mk/run-sample.sh $(SSH_TARGET):$(SAMPLES_TARGET_DIR)
+else
+	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/run-sample.sh $(SSH_TARGET):$(SAMPLES_TARGET_DIR)
+	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/crypto_inline/build/snr_test $(SSH_TARGET):$(SAMPLES_TARGET_DIR)/crypto_inline
+	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/crypto_lookaside/build/snr_test $(SSH_TARGET):$(SAMPLES_TARGET_DIR)/crypto_lookaside
+	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/data_path_sample_multiFlow/build/snr_test $(SSH_TARGET):$(SAMPLES_TARGET_DIR)/data_path_sample_multiFlow
+	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/PortSetMode/snrPortSetMode $(SSH_TARGET):$(SAMPLES_TARGET_DIR)/snrPortSetMode
+	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/cpu_dsi_lpbk/build/snr_test $(SSH_TARGET):$(SAMPLES_TARGET_DIR)/cpu_dsi_lpbk
+	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/cpu_dsi_lpbk/*.pcap $(SSH_TARGET):$(SAMPLES_TARGET_DIR)
+	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/cpu_inline_lpbk/build/snr_test $(SSH_TARGET):$(SAMPLES_TARGET_DIR)/cpu_inline_lpbk
+	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/cpu_inline_lpbk/*.pcap $(SSH_TARGET):$(SAMPLES_TARGET_DIR)
+endif
 
 rdk-samples-clean:
 	$(RM) -r $(SAMPLES_BUILD_DIR)
