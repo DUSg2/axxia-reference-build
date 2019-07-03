@@ -24,7 +24,7 @@ help::
 -include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = faeb366bc3eb322f5f203cfe08dc4cf529a822e9
+POKY_REL = 50f33d3bfebcbfb1538d932fb487cfd789872026
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
 OE_REL = 4cd3a39f22a2712bfa8fc657d09fe2c7765a4005
@@ -36,7 +36,7 @@ LAYERS += $(TOP)/build/layers/meta-openembedded/meta-filesystems
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-perl
 
 VIRT_URL = git://git.yoctoproject.org/meta-virtualization
-VIRT_REL = 9e8c0c96b443828a255e7d6ca6291598347672ac
+VIRT_REL = 9b568b6ae1bf1bebcb9552703ee40f9b880e07ed
 LAYERS += $(TOP)/build/layers/meta-virtualization
 
 INTEL_URL=git://git.yoctoproject.org/meta-intel
@@ -48,10 +48,11 @@ SECUR_REL = 31dc4e7532fa7a82060e0b50e5eb8d0414aa7e93
 LAYERS += $(TOP)/build/layers/meta-security
 LAYERS += $(TOP)/build/layers/meta-security/meta-tpm
 
-REL_NR=snr_ase_rdk_1904
+REL_NR=snr_ase_rdk_1905
+ADK_REL=adk-0.0.6.075_610
 
 SNR_BASE=/wr/installs/snr
-SNR_ADK_DIR=$(SNR_BASE)/$(REL_NR)
+SNR_ADK_DIR=$(SNR_BASE)/$(ADK_REL)
 SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
 SNR_DPDK_DIR=$(SNR_BASE)/$(REL_NR)
 SNR_RDK_DIR=$(SNR_BASE)/$(REL_NR)
@@ -162,8 +163,8 @@ build/build: build $(LAYERS)
 		echo "RUNTARGET = \"snr\"" >> conf/local.conf ; \
 		echo "RELEASE_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
 		echo "RDK_TOOLS_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
-		echo "PREFERRED_PROVIDER_virtual/kernel = \"linux-yocto\"" >> conf/local.conf ; \
-		echo "PREFERRED_VERSION_linux-yocto = \"4.12%\"" >> conf/local.conf ; \
+		echo "PREFERRED_PROVIDER_virtual/kernel = \"linux-intel\"" >> conf/local.conf ; \
+		echo "PREFERRED_VERSION_linux-intel = \"4.19%\"" >> conf/local.conf ; \
 		echo "TOOLCHAIN_TARGET_TASK_append = \" kernel-dev kernel-devsrc\""  >> conf/local.conf ; \
 		if [ $(SSTATE_MIRROR_DIR) ]; then \
 			echo "SSTATE_MIRRORS ?= \"file://.* file://$(SSTATE_MIRROR_DIR)PATH\"" >> conf/local.conf; \

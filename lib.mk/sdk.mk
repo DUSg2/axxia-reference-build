@@ -20,7 +20,7 @@ esdk-build: build/build
 sdk-install:
 	$(RM) -r $(TOP)/build/sdk
 	$(SDK_FILE) -y -d $(TOP)/build/sdk
-	$(MAKE) -C $(TOP)/build/sdk/sysroots/$(TUNE)-intelaxxia-linux/usr/src/kernel scripts
+	$(MAKE) -C $(TOP)/build/sdk/sysroots/core2snr-64-intelaxxia-linux/usr/src/kernel scripts tools/objtool
 
 sdk-clean:
 	$(RM) -r $(TOP)/build/sdk
