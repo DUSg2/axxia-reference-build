@@ -24,10 +24,10 @@ help::
 -include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = 50f33d3bfebcbfb1538d932fb487cfd789872026
+POKY_REL = cdd4a52578f4f1b79b3fc2c92aa4434b99efd91c
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
-OE_REL = 4cd3a39f22a2712bfa8fc657d09fe2c7765a4005
+OE_REL = 9b3b907f30b0d5b92d58c7e68289184fda733d3e
 LAYERS += $(TOP)/build/layers/meta-openembedded
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-oe
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-python
@@ -36,11 +36,11 @@ LAYERS += $(TOP)/build/layers/meta-openembedded/meta-filesystems
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-perl
 
 VIRT_URL = git://git.yoctoproject.org/meta-virtualization
-VIRT_REL = 9b568b6ae1bf1bebcb9552703ee40f9b880e07ed
+VIRT_REL = bbc38dc9d6d02e73c08df289bb22a292c2264e9b
 LAYERS += $(TOP)/build/layers/meta-virtualization
 
 INTEL_URL=git://git.yoctoproject.org/meta-intel
-INTEL_REL=27dadcfc7bc0de70328b02fecb841608389d22fc
+INTEL_REL=3c45215fe075ddaa892bc87f969f50684a7062b4
 LAYERS += $(TOP)/build/layers/meta-intel
 
 SECUR_URL = https://git.yoctoproject.org/git/meta-security
@@ -48,8 +48,12 @@ SECUR_REL = 31dc4e7532fa7a82060e0b50e5eb8d0414aa7e93
 LAYERS += $(TOP)/build/layers/meta-security
 LAYERS += $(TOP)/build/layers/meta-security/meta-tpm
 
-REL_NR=snr_ase_rdk_1905
-ADK_REL=adk-0.0.6.075_610
+ROS_URL = git://github.com/bmwcarit/meta-ros.git
+ROS_REL = 72068b17e4192b51e09c8dc633805a35edac8701
+LAYERS += $(TOP)/build/layers/meta-ros
+
+REL_NR=snr_ase_rdk_1907
+ADK_REL=adk-0.0.6.082_608
 
 SNR_BASE=/wr/installs/snr
 SNR_ADK_DIR=$(SNR_BASE)/$(ADK_REL)
@@ -134,6 +138,9 @@ $(TOP)/build/layers/meta-intel-axxia-adknetd:
 	tar -xzf $(AXXIA_ADK_LAYER) -C $(TOP)/build/layers
 	cp $(AXXIA_ADK_SRC) $@/downloads/adk_source.tiger_netd.tar.gz
 
+$(TOP)/build/layers/meta-ros:
+	git -C $(TOP)/build/layers clone $(ROS_URL) $@
+	git -C $@ checkout $(ROS_REL)
 
 .PHONY: extract-rdk-patches
 extract-rdk-patches:
@@ -163,6 +170,7 @@ build/build: build $(LAYERS)
 		echo "RUNTARGET = \"snr\"" >> conf/local.conf ; \
 		echo "RELEASE_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
 		echo "RDK_TOOLS_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
+		echo "RDK_KLM_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \
 		echo "PREFERRED_PROVIDER_virtual/kernel = \"linux-intel\"" >> conf/local.conf ; \
 		echo "PREFERRED_VERSION_linux-intel = \"4.19%\"" >> conf/local.conf ; \
 		echo "TOOLCHAIN_TARGET_TASK_append = \" kernel-dev kernel-devsrc\""  >> conf/local.conf ; \
