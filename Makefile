@@ -24,23 +24,24 @@ help::
 -include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = cdd4a52578f4f1b79b3fc2c92aa4434b99efd91c
+POKY_REL = e6949336479e611a142834b6d9241514cbaeaf80
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
-OE_REL = 9b3b907f30b0d5b92d58c7e68289184fda733d3e
+OE_REL = 2d088d252624b19df384aecc434d23afb636178f
 LAYERS += $(TOP)/build/layers/meta-openembedded
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-oe
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-python
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-networking
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-filesystems
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-perl
+LAYERS += $(TOP)/layers/meta-prime-addons
 
 VIRT_URL = git://git.yoctoproject.org/meta-virtualization
-VIRT_REL = bbc38dc9d6d02e73c08df289bb22a292c2264e9b
+VIRT_REL = 7685c7d415e0002c448007960837ae8898cd57a5
 LAYERS += $(TOP)/build/layers/meta-virtualization
 
 INTEL_URL=git://git.yoctoproject.org/meta-intel
-INTEL_REL=3c45215fe075ddaa892bc87f969f50684a7062b4
+INTEL_REL=c200851435f39acd2fe4abbf7a05fbf617833964
 LAYERS += $(TOP)/build/layers/meta-intel
 
 SECUR_URL = https://git.yoctoproject.org/git/meta-security
@@ -49,14 +50,12 @@ LAYERS += $(TOP)/build/layers/meta-security
 LAYERS += $(TOP)/build/layers/meta-security/meta-tpm
 
 ROS_URL = git://github.com/bmwcarit/meta-ros.git
-ROS_REL = 72068b17e4192b51e09c8dc633805a35edac8701
+ROS_REL = 7d24d8c960a7ae9eb65789395965e8f1b83b366e
 LAYERS += $(TOP)/build/layers/meta-ros
 
-REL_NR=snr_ase_rdk_1907
-ADK_REL=adk-0.0.6.082_608
+REL_NR=snr_ase_rdk_1910
 
 SNR_BASE=/wr/installs/snr
-SNR_ADK_DIR=$(SNR_BASE)/$(ADK_REL)
 SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
 SNR_DPDK_DIR=$(SNR_BASE)/$(REL_NR)
 SNR_RDK_DIR=$(SNR_BASE)/$(REL_NR)
@@ -74,10 +73,6 @@ LAYERS += $(TOP)/build/layers/meta-intel-axxia-rdk
 AXXIA_RDK_URL=git@github.com:axxia/meta-intel-axxia-rdk.git
 AXXIA_RDK_KLM=$(SNR_RDK_DIR)/rdk_klm_src_*xz
 AXXIA_RDK_USER=$(SNR_RDK_DIR)/rdk_user_src_*xz
-
-LAYERS += $(TOP)/build/layers/meta-intel-axxia-adknetd
-AXXIA_ADK_LAYER=$(SNR_ADK_DIR)/adk_meta-intel-axxia-adknetd*.tar.gz
-AXXIA_ADK_SRC=$(SNR_ADK_DIR)/adk_source*.tar.gz
 
 endif
 
@@ -133,10 +128,6 @@ $(TOP)/build/layers/meta-intel-axxia-rdk:
 	cp $(AXXIA_RDK_USER) $@/downloads/rdk_user_src.tar.xz
 	mkdir -p $@/downloads/unpacked
 	tar -C $@/downloads/unpacked -xf $(AXXIA_RDK_KLM)
-
-$(TOP)/build/layers/meta-intel-axxia-adknetd:
-	tar -xzf $(AXXIA_ADK_LAYER) -C $(TOP)/build/layers
-	cp $(AXXIA_ADK_SRC) $@/downloads/adk_source.tiger_netd.tar.gz
 
 $(TOP)/build/layers/meta-ros:
 	git -C $(TOP)/build/layers clone $(ROS_URL) $@

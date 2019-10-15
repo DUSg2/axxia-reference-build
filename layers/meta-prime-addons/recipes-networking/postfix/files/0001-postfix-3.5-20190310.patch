@@ -1,0 +1,53 @@
+From e1e96a02c320d822bce9ff14522450f002cd645a Mon Sep 17 00:00:00 2001
+From: Wietse Venema <wietse@porcupine.org>
+Date: Sun, 10 Mar 2019 00:00:00 -0500
+Subject: [PATCH] postfix-3.5-20190310
+
+---
+ HISTORY                           | 17 +++++++++++++++++
+ makedefs                          |  2 +-
+ src/util/sys_defs.h               |  2 +-
+ 7 files changed, 23 insertions(+), 9 deletions(-)
+
+diff --git a/HISTORY b/HISTORY
+index 134ed0f8..80134b11 100644
+--- a/HISTORY
++++ b/HISTORY
+@@ -23364,3 +23364,8 @@ Apologies for any names omitted.
+ 	from Andreas Schulze, Eray Aslan, and Viktor Dukhovni.
+ 	Files: postfix/postfix.c, master/master.c, master/master.h,
+ 	master/master_sig.c, conf/postfix-script.
++
++20190310
++
++	Bitrot: LINUX5s support, after some sanity checks with a
++	rawhide prerelease version. Files: makedefs, util/sys_defs.h.
+diff --git a/makedefs b/makedefs
+index 5b16e1fb..c9e50db7 100644
+--- a/makedefs
++++ b/makedefs
+@@ -532,7 +532,7 @@ EOF
+ 		: ${SHLIB_ENV="LD_LIBRARY_PATH=`pwd`/lib"}
+ 		: ${PLUGIN_LD="${CC-gcc} -shared"}
+ 		;;
+-  Linux.[34].*)	SYSTYPE=LINUX$RELEASE_MAJOR
++ Linux.[345].*)	SYSTYPE=LINUX$RELEASE_MAJOR
+ 		case "$CCARGS" in
+ 		 *-DNO_DB*) ;;
+ 		 *-DHAS_DB*) ;;
+diff --git a/src/util/sys_defs.h b/src/util/sys_defs.h
+index a8d25712..39daa16d 100644
+--- a/src/util/sys_defs.h
++++ b/src/util/sys_defs.h
+@@ -748,7 +748,7 @@ extern int initgroups(const char *, int)
+  /*
+   * LINUX.
+   */
+-#if defined(LINUX2) || defined(LINUX3) || defined(LINUX4)
++#if defined(LINUX2) || defined(LINUX3) || defined(LINUX4) || defined(LINUX5)
+ #define SUPPORTED
+ #define UINT32_TYPE	unsigned int
+ #define UINT16_TYPE	unsigned short
+-- 
+2.17.1
+
