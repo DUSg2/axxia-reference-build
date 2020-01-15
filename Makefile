@@ -24,24 +24,23 @@ help::
 -include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = e6949336479e611a142834b6d9241514cbaeaf80
+POKY_REL = 51f6145f8f99a02df1dad937684f014b0172e72a
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
-OE_REL = 2d088d252624b19df384aecc434d23afb636178f
+OE_REL = 446bd615fd7cb9bc7a159fe5c2019ed08d1a7a93
 LAYERS += $(TOP)/build/layers/meta-openembedded
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-oe
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-python
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-networking
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-filesystems
 LAYERS += $(TOP)/build/layers/meta-openembedded/meta-perl
-LAYERS += $(TOP)/layers/meta-prime-addons
 
 VIRT_URL = git://git.yoctoproject.org/meta-virtualization
 VIRT_REL = 7685c7d415e0002c448007960837ae8898cd57a5
 LAYERS += $(TOP)/build/layers/meta-virtualization
 
 INTEL_URL=git://git.yoctoproject.org/meta-intel
-INTEL_REL=c200851435f39acd2fe4abbf7a05fbf617833964
+INTEL_REL= a930f946b915624dcc02358725d235b3224fb61b
 LAYERS += $(TOP)/build/layers/meta-intel
 
 SECUR_URL = https://git.yoctoproject.org/git/meta-security
@@ -53,7 +52,7 @@ ROS_URL = git://github.com/bmwcarit/meta-ros.git
 ROS_REL = 7d24d8c960a7ae9eb65789395965e8f1b83b366e
 LAYERS += $(TOP)/build/layers/meta-ros
 
-REL_NR=snr_ase_rdk_1910
+REL_NR=snr_ase_rdk_1912
 
 SNR_BASE=/wr/installs/snr
 SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
