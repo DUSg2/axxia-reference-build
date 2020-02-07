@@ -1,7 +1,7 @@
 
-DPDK_REV=v18.11
+DPDK_REV=v18.11.2
 DPDK_BUILD_DIR=$(TOP)/build/dpdk-build
-DPDK_DIR=$(DPDK_BUILD_DIR)/rdk_user/dpdk-$(subst v,,$(DPDK_REV))
+DPDK_DIR=$(DPDK_BUILD_DIR)/rdk_user/dpdk-stable-$(subst v,,$(DPDK_REV))
 DPDK_PATCH=$(SNR_DPDK_DIR)/dpdk_diff_snr*.patch
 
 DPDK_TARGET_DIR=/opt/dpdk

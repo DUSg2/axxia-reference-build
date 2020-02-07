@@ -24,7 +24,7 @@ help::
 -include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = 51f6145f8f99a02df1dad937684f014b0172e72a
+POKY_REL = 390f760d176aba8a320ea66b8112469d89e9e2d4
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
 OE_REL = 446bd615fd7cb9bc7a159fe5c2019ed08d1a7a93
@@ -52,7 +52,7 @@ ROS_URL = git://github.com/bmwcarit/meta-ros.git
 ROS_REL = 7d24d8c960a7ae9eb65789395965e8f1b83b366e
 LAYERS += $(TOP)/build/layers/meta-ros
 
-REL_NR=snr_ase_rdk_1912
+REL_NR=snr_ase_rdk_2001
 
 SNR_BASE=/wr/installs/snr
 SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
