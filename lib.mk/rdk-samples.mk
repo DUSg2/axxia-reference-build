@@ -7,9 +7,7 @@ RDK_SAMPLES=crypto_inline \
 	crypto_lookaside \
 	data_path_sample_multiFlow \
 	cpu_dsi_lpbk \
-	cpu_inline_lpbk \
-	rx_timestamping_lan_adk_netd
-	
+	cpu_inline_lpbk
 
 help:: rdk-samples.help
 
@@ -69,7 +67,6 @@ rdk-samples-install:
 		cp $(SAMPLES_BUILD_DIR)/cpu_inline_lpbk/build/snr_test $(SAMPLES_BUILD_DIR)/build/cpu_inline_lpbk ; \
 		cp $(SAMPLES_BUILD_DIR)/cpu_inline_lpbk/*.pcap $(SAMPLES_BUILD_DIR)/build ; \
 		cp $(SAMPLES_BUILD_DIR)/data_path_sample_multiFlow/stats_monitor/build/stats_monitor  $(SAMPLES_BUILD_DIR)/build ; \
-		cp $(SAMPLES_BUILD_DIR)/rx_timestamping_lan_adk_netd/rx_timestamp_socket $(SAMPLES_BUILD_DIR)/build ; \
 	fi;
 
 rdk-samples-deploy: rdk-samples-install
@@ -87,7 +84,6 @@ else
 	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/cpu_dsi_lpbk/*.pcap $(SSH_TARGET):$(SAMPLES_TARGET_DIR)
 	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/cpu_inline_lpbk/build/snr_test $(SSH_TARGET):$(SAMPLES_TARGET_DIR)/cpu_inline_lpbk
 	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/cpu_inline_lpbk/*.pcap $(SSH_TARGET):$(SAMPLES_TARGET_DIR)
-	$(SCP_CMD) $(SNR_REL_DIR)/$(SNR_RELEASE)/$(SAMPLES_TARGET_DIR)/rx_timestamping_lan_adk_netd/rx_timestamp_socket $(SSH_TARGET):$(SAMPLES_TARGET_DIR)
 endif
 
 rdk-samples-clean:
