@@ -1,5 +1,4 @@
-
-DPDK_REV=v18.11.2
+DPDK_REV=v19.11.2
 DPDK_BUILD_DIR=$(TOP)/build/dpdk-build
 DPDK_DIR=$(DPDK_BUILD_DIR)/rdk_user/dpdk-stable-$(subst v,,$(DPDK_REV))
 DPDK_PATCH=$(SNR_DPDK_DIR)/dpdk_diff_snr*.patch
@@ -42,7 +41,7 @@ dpdk-build: dpdk-fetch
 		export SYSROOT=$$SDKTARGETSYSROOT ; \
 		source iwa_rdk.env ; \
 		export RTE_SDK=$(DPDK_DIR) ; \
-		make dpdk ; \
+		make dpdk -j $(($(nproc) / 2)); \
 	fi;
 
 dpdk-deploy:

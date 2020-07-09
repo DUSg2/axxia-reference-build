@@ -32,6 +32,7 @@ rdk-samples-fetch:
 			cp -r $(AXXIA_RDK_SAMPLES)/$$dir $(SAMPLES_BUILD_DIR); \
 		done; \
 		cp -r $(AXXIA_RDK_SAMPLES)/common $(SAMPLES_BUILD_DIR) ; \
+		cp -r $(AXXIA_RDK_SAMPLES)/shared $(SAMPLES_BUILD_DIR); \
 	fi;
 
 rdk-samples-build: rdk-samples-fetch

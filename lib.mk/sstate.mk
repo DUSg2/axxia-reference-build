@@ -6,7 +6,7 @@ help:: sstate.help
 
 sstate.help:
 	$(ECHO) "\n--- sstate ---"
-	$(ECHO) "sstate-deploy             : deploys local sstate to $(SSTATE_MIRROR)"
+	$(ECHO) "sstate-deploy             	: deploys local sstate to $(SSTATE_MIRROR_DIR)"
 
 sstate-deploy:
 ifdef SSTATE_MIRROR_DIR

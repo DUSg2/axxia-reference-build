@@ -7,15 +7,24 @@ vlm.help:
 	$(ECHO) " vlm-connect-console       	: connect to the serial port of the VLM target through telnet"
 
 vlm-check-id:
-	@if [ "$(VLM_ID)" == "" ]; then \
+	$(Q)if [ "$(VLM_ID)" == "" ]; then \
 		echo "$(TARGET) is not a VLM target" ;\
 		exit 1 ;\
 	fi
 
+vlm-check-reserved: vlm-check-id
+	$(ECHO) -n "Checking target is reserved..."
+	$(Q)status=$$($(VLMTOOL) findMine | grep $(VLM_ID)) ;\
+	if !(echo "$$status" | grep -q "$(VLM_ID)"); then \
+		echo " ooops it wasn't. bailing out." ;\
+		exit 1 ;\
+	fi
+	$(ECHO) " OK"
+
 vlm-reserve: vlm-check-id
-	@TARGET_USER=$$($(VLMTOOL) getAttr -t $(VLM_ID) all | grep -i "reserved by" | cut -d ":" -f 2 | tr -d " ") ; \
+	$(Q)TARGET_USER=$$($(VLMTOOL) getAttr -t $(VLM_ID) all | grep -i "reserved by" | cut -d ":" -f 2 | tr -d " ") ; \
 	if [ ! -z $$TARGET_USER ]; then \
-		if [ "$$TARGET_USER" == "$$(whoami)" ]; then \
+		if [ "$$TARGET_USER" == "$(USER)" ]; then \
 			echo "Target is already reserved by you!" ; \
 		else \
 			echo "Target is reserved by $$TARGET_USER." ; \
@@ -28,9 +37,9 @@ vlm-reserve: vlm-check-id
 	fi
 
 vlm-unreserve: vlm-check-id
-	@TARGET_USER=$$($(VLMTOOL) getAttr -t $(VLM_ID) all | grep -i "reserved by" | cut -d ":" -f 2 | tr -d " ") ; \
+	$(Q)TARGET_USER=$$($(VLMTOOL) getAttr -t $(VLM_ID) all | grep -i "reserved by" | cut -d ":" -f 2 | tr -d " ") ; \
 	if [ ! -z $$TARGET_USER ]; then \
-		if [ "$$TARGET_USER" == "$$(whoami)" ]; then \
+		if [ "$$TARGET_USER" == "$(USER)" ]; then \
 			echo "Unreserving target.." ; \
 			$(VLMTOOL) unreserve -t $(VLM_ID); \
 		else \
@@ -43,9 +52,9 @@ vlm-unreserve: vlm-check-id
 	fi
 
 vlm-connect-console: vlm-check-id
-	@TARGET_USER=$$($(VLMTOOL) getAttr -t $(VLM_ID) all | grep -i "reserved by" | cut -d ":" -f 2 | tr -d " ") ; \
+	$(Q)TARGET_USER=$$($(VLMTOOL) getAttr -t $(VLM_ID) all | grep -i "reserved by" | cut -d ":" -f 2 | tr -d " ") ; \
 	if [ ! -z $$TARGET_USER ]; then \
-		if [ "$$TARGET_USER" == "$$(whoami)" ]; then \
+		if [ "$$TARGET_USER" == "$(USER)" ]; then \
 			echo "Connecting to telnet server.." ; \
 			TELNET_INFO=$$($(VLMTOOL) getAttr -t $(VLM_ID) all | grep -i 'terminal' | cut -d ':' -f 2 ) ; \
 			TELNET_INFO=($$TELNET_INFO) ; \
@@ -61,3 +70,9 @@ vlm-connect-console: vlm-check-id
 		exit 1 ; \
 	fi
 
+vlm-restart-target: vlm-check-id
+	$(ECHO) "Powering target off" ; \
+	$(VLMTOOL) turnOff -t $(VLM_ID) ; \
+	sleep 20 ; \
+	echo -e "Powering target on" ; \
+	$(VLMTOOL) turnOn -t $(VLM_ID)

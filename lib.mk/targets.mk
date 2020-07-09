@@ -1,7 +1,14 @@
 TARGET     ?= ase-sim
 
 ifeq ($(TARGET),ase-sim)
-SSH_PORT   := $(shell grep -a ^"Host TCP port" build/ase-sim/ase.sim.log 2>/dev/null | grep 22 | cut -d" " -f 4)
+SIM        := ase
+SSH_PORT   := $(shell grep -a ^"Host TCP port" build/$(SIM)-sim/$(SIM).sim.log 2>/dev/null | grep 22 | cut -d" " -f 4)
+SSH_IP     := localhost
+endif
+
+ifeq ($(TARGET),simics-sim)
+SIM        := simics
+SSH_PORT   := $(shell grep -a ^"Host TCP port" build/$(SIM)-sim/$(SIM).sim.log 2>/dev/null | grep 22 | cut -d" " -f 4)
 SSH_IP     := localhost
 endif
 
@@ -21,3 +28,6 @@ SSH_TARGET := root@$(SSH_IP)
 SSH_OPT    := -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no
 SSH_CMD    := $(SSH) -p $(SSH_PORT) $(SSH_OPT) $(SSH_TARGET)
 SCP_CMD    := $(SCP) -P $(SSH_PORT) $(SSH_OPT)
+
+# we must be able to print variables for outside script usage
+print-%  : ; @echo $* = $($*)

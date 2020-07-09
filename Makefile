@@ -24,7 +24,7 @@ help::
 -include $(TOP)/lib.mk/*.mk
 
 POKY_URL = git://git.yoctoproject.org/poky.git
-POKY_REL = 390f760d176aba8a320ea66b8112469d89e9e2d4
+POKY_REL = 958427e9d2ee7276887f2b02ba85cf0996dea553
 
 OE_URL = https://github.com/openembedded/meta-openembedded.git
 OE_REL = 446bd615fd7cb9bc7a159fe5c2019ed08d1a7a93
@@ -53,33 +53,28 @@ ROS_URL = git://github.com/bmwcarit/meta-ros.git
 ROS_REL = 7d24d8c960a7ae9eb65789395965e8f1b83b366e
 LAYERS += $(TOP)/build/layers/meta-ros
 
-REL_NR=snr_rdk_2002
-
-SNR_BASE=/wr/installs/snr
-SNR_ASE_DIR=$(SNR_BASE)/$(REL_NR)/ase
-SNR_DPDK_DIR=$(SNR_BASE)/$(REL_NR)
-SNR_RDK_DIR=$(SNR_BASE)/$(REL_NR)
-SNR_SAMPLES_DIR=$(SNR_BASE)/$(REL_NR)/samples/snr
-
-AXXIA_URL=git@github.com:axxia/meta-intel-axxia.git
-AXXIA_REL=$(REL_NR)
 LAYERS += $(TOP)/build/layers/meta-intel-axxia/meta-intel-snr
-LAYERS += $(TOP)/build/layers/meta-intel-axxia/meta-intel-axxia
-
+LAYERS += $(TOP)/build/layers/meta-intel-axxia/meta-intel-vcn
+AXXIA_URL=git@github.com:axxia/meta-intel-axxia.git
 ENABLE_AXXIA_RDK=yes
+
 ifeq ($(ENABLE_AXXIA_RDK),yes)
-
-LAYERS += $(TOP)/build/layers/meta-intel-axxia-rdk
-AXXIA_RDK_URL=git@github.com:axxia/meta-intel-axxia-rdk.git
-AXXIA_RDK_KLM=$(SNR_RDK_DIR)/rdk_klm_src_*xz
-AXXIA_RDK_USER=$(SNR_RDK_DIR)/rdk_user_src_*xz
-
+LAYERS += $(TOP)/build/layers/meta-intel-axxia/meta-intel-rdk
+AXXIA_RDK_KLM=$(shell ls $(SNR_RDK_DIR)/rdk_klm_src_*xz)
+AXXIA_RDK_USER=$(shell ls $(SNR_RDK_DIR)/rdk_user_src_*xz)
 endif
 
+AXXIA_REL=snr_ase_rdk_2007
+ENABLE_AXXIA_RDK=yes
+
+SNR_BASE=/wr/installs/snr
+SNR_ASE_DIR=$(SNR_BASE)/$(AXXIA_REL)/ase
+SNR_DPDK_DIR=$(SNR_BASE)/$(AXXIA_REL)
+SNR_RDK_DIR=$(SNR_BASE)/$(AXXIA_REL)
+SNR_SAMPLES_DIR=$(SNR_BASE)/$(AXXIA_REL)/samples/snr
 AXXIA_RDK_SAMPLES=$(SNR_SAMPLES_DIR)
 
 MACHINE=axxiax86-64
-
 IMAGE=axxia-image-vcn
 
 define bitbake
@@ -108,36 +103,30 @@ $(TOP)/build/layers/meta-intel:
 	git -C $(TOP)/build/layers clone $(INTEL_URL) $@
 	git -C $@ checkout $(INTEL_REL)
 
-$(TOP)/build/layers/meta-intel-axxia:
-	git -C $(TOP)/build/layers clone $(AXXIA_URL) $@
-	git -C $@ checkout $(AXXIA_REL)
-
 $(TOP)/build/layers/meta-security:
 	git -C $(TOP)/build/layers clone $(SECUR_URL) $@
 	git -C $@ checkout $(SECUR_REL)
-
-$(TOP)/build/layers/meta-intel-axxia/meta-intel-snr: $(TOP)/build/layers/meta-intel-axxia
-
-ifeq ($(ENABLE_AXXIA_RDK),yes)
-
-$(TOP)/build/layers/meta-intel-axxia-rdk:
-	git -C $(TOP)/build/layers clone $(AXXIA_RDK_URL) $@
-	git -C $@ checkout $(AXXIA_REL)
-	mkdir -p $@/downloads
-	cp $(AXXIA_RDK_KLM) $@/downloads/rdk_klm_src.tar.xz
-	cp $(AXXIA_RDK_USER) $@/downloads/rdk_user_src.tar.xz
-	mkdir -p $@/downloads/unpacked
-	tar -C $@/downloads/unpacked -xf $(AXXIA_RDK_KLM)
 
 $(TOP)/build/layers/meta-ros:
 	git -C $(TOP)/build/layers clone $(ROS_URL) $@
 	git -C $@ checkout $(ROS_REL)
 
-.PHONY: extract-rdk-patches
-extract-rdk-patches:
-	mkdir -p $(TOP)/build/extracted-rdk-patches
-	git -C build/build/tmp/work-shared/axxiax86-64/kernel-source format-patch -o $(TOP)/build/extracted-rdk-patches before_rdk_commits..after_rdk_commits
+$(TOP)/build/layers/meta-intel-axxia/meta-intel-snr:
+	git -C $(TOP)/build/layers clone --quiet $(AXXIA_URL)
+	git -C $(TOP)/build/layers/meta-intel-axxia checkout --quiet $(AXXIA_REL)
+ifeq ($(ENABLE_AXXIA_RDK),yes)
+	mkdir -p $(TOP)/build/layers/meta-intel-axxia/meta-intel-rdk/downloads
+	cp $(AXXIA_RDK_KLM) $(TOP)/build/layers/meta-intel-axxia/meta-intel-rdk/downloads/rdk_klm_src.tar.xz
+	cp $(AXXIA_RDK_USER) $(TOP)/build/layers/meta-intel-axxia/meta-intel-rdk/downloads/rdk_user_src.tar.xz
+	mkdir -p $@/downloads/unpacked
+	tar -C $@/downloads/unpacked -xf $(AXXIA_RDK_KLM)
 endif
+
+ifeq ($(ENABLE_AXXIA_RDK),yes)
+$(TOP)/build/layers/meta-intel-axxia/meta-intel-rdk: $(TOP)/build/layers/meta-intel-axxia/meta-intel-snr
+endif
+
+$(TOP)/build/layers/meta-intel-axxia/meta-intel-vcn: $(TOP)/build/layers/meta-intel-axxia/meta-intel-snr
 
 .PHONY: build
 build:
@@ -156,7 +145,7 @@ build/build: build $(LAYERS)
 		source poky/oe-init-build-env ; \
 		$(foreach layer, $(LAYERS), bitbake-layers add-layer -F $(layer);) \
 		sed -i s/^MACHINE.*/MACHINE\ =\ \"$(MACHINE)\"/g conf/local.conf ; \
-		echo "DISTRO = \"intel-axxia-indist\"" >> conf/local.conf ; \
+		echo "DISTRO = \"intel-axxia\"" >> conf/local.conf ; \
 		echo "DISTRO_FEATURES_append = \" rdk-userspace\"" >> conf/local.conf ; \
 		echo "RUNTARGET = \"snr\"" >> conf/local.conf ; \
 		echo "RELEASE_VERSION = \"$(AXXIA_REL)\"" >> conf/local.conf ; \

@@ -25,3 +25,12 @@ SSHPASS	       := $(Q)sshpass
 TAR            ?= $(Q)tar
 XMLSTARLET     := $(Q)xmlstarlet
 XTERM          ?= $(Q)x-terminal-emulator
+NO_STDOUT	= >/dev/null
+
+# Echo helpers
+INFO_MSG	= [i]
+COL_NC		= \e[0m
+COL_LIGHT_GREEN = \e[1;32m
+COL_LIGHT_RED	= \e[1;31m
+GREEN_TICK	= [$(COL_LIGHT_GREEN)✓$(COL_NC)]
+RED_CROSS	= [$(COL_LIGHT_RED)✗$(COL_NC)]

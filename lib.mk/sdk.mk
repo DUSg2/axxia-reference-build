@@ -7,9 +7,8 @@ sdk-help:
 	$(ECHO) " sdk-install               	: installs the sdk"
 	$(ECHO) " sdk-clean                 	: removes any installed sdk"
 
-TUNE = $(shell cd $(TOP)/build ; source poky/oe-init-build-env >/dev/null ; bitbake -e | grep "TUNE_PKGARCH=" | cut -d "\"" -f 2)
-SDK_FILE=$(TOP)/build/build/tmp/deploy/sdk/intel-axxia-indist-glibc-x86_64-$(IMAGE)-$(TUNE)-toolchain-$(AXXIA_REL).sh
-SDK_ENV=$(TOP)/build/sdk/environment-setup-$(TUNE)-intelaxxia-linux
+SDK_FILE=$(WRL_BUILD_DEPLOY_DIR)/sdk/intel-axxia-glibc-x86_64-axxia-image-vcn-snr-64-toolchain-$(AXXIA_REL).sh
+SDK_ENV=$(TOP)/build/sdk/environment-setup-snr-64-intelaxxia-linux
 
 sdk-build: build/build
 	$(call bitbake-task, $(IMAGE), populate_sdk)
@@ -18,9 +17,8 @@ esdk-build: build/build
 	$(call bitbake-task, $(IMAGE), populate_sdk_ext)
 
 sdk-install:
-	$(RM) -r $(TOP)/build/sdk
 	$(SDK_FILE) -y -d $(TOP)/build/sdk
-	$(MAKE) -C $(TOP)/build/sdk/sysroots/core2snr-64-intelaxxia-linux/usr/src/kernel scripts tools/objtool
+	$(MAKE) -C $(TOP)/build/sdk/sysroots/snr-64-intelaxxia-linux/usr/src/kernel scripts tools/objtool
 
 sdk-clean:
 	$(RM) -r $(TOP)/build/sdk

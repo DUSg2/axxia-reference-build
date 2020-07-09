@@ -19,6 +19,13 @@ help()
 EOF
 }
 
+remove_driver()
+{
+	DRIVER=$1
+	echo "Removing $DRIVER"
+	rmmod $DRIVER || echo "Ignoring removal failure of $DRIVER"
+}
+
 check_sku()
 {
   SKUVAL=$(setpci -d 8086:18a0 0x354.l)
@@ -49,14 +56,14 @@ load_driver()
 
 tear_down()
 {
-	#UnLoad drivers
-	echo "Unloading Drivers:....."
-	sleep 5
-	drivers=("adk_netd" "ice_sw_ae" "ies" "ipsec_inline" "ice_sw" "hqm"
-								"qat_c4xxx" "usdm_drv" "intel_qat")
-	for i in "${drivers[@]}"; do
-	    remove_driver $i
-	done
+        #UnLoad drivers
+        echo "Unloading Drivers:....."
+        sleep 5
+        drivers=("adk_netd" "ice_sw_ae" "ies" "ipsec_inline"
+                 "qat_c4xxx" "usdm_drv" "intel_qat" "ice_sw" "hqm")
+        for i in "${drivers[@]}"; do
+            remove_driver $i
+        done
 }
 
 init_hugepages()
@@ -85,7 +92,7 @@ driver_init_dsi()
 {
 	#Load drivers if not loaded already
 	echo "Loading Drivers:....."
-	drivers=("uio" "ice_sw nd_vis=0" "ice_sw_ae" "ies" "hqm" "adk_netd netlink_mode=0")
+	drivers=("uio" "ice_sw" "ice_sw_ae" "ies" "hqm" "adk_netd netlink_mode=0")
 	for i in "${drivers[@]}"
 	do
 		load_driver $i
@@ -101,7 +108,7 @@ driver_init_inline()
 {
         #Load drivers if not loaded already
         echo "Loading Drivers:....."
-        drivers=("uio" "ice_sw nd_vis=0" "ice_sw_ae" "ies" "hqm" "adk_netd netlink_mode=0")
+        drivers=("uio" "ice_sw" "ice_sw_ae" "ies" "hqm" "adk_netd netlink_mode=0")
         for i in "${drivers[@]}"
         do
                 load_driver $i
@@ -147,7 +154,7 @@ run_datapath()
 	# Testcase setup
 	init_hugepages
 	
-	drivers=("uio" "ice_sw nd_vis=0" "ice_sw_ae" "ies" "hqm" "adk_netd netlink_mode=0")
+	drivers=("uio" "ice_sw" "ice_sw_ae" "ies" "hqm" "adk_netd netlink_mode=0")
 	for i in "${drivers[@]}"
 	do
 	    load_driver $i
@@ -164,7 +171,7 @@ run_crypto_inline()
 	# Mount huge pages.
 	init_hugepages
 	
-	drivers=("uio" "authenc" "dh_generic" "crc8" "ice_sw nd_vis=0" "ice_sw_ae" "ies" "hqm" "adk_netd netlink_mode=0")
+	drivers=("uio" "authenc" "dh_generic" "crc8" "ice_sw" "ice_sw_ae" "ies" "hqm" "adk_netd netlink_mode=0")
 	for i in "${drivers[@]}"
 	do
     		load_driver $i
@@ -210,7 +217,7 @@ run_crypto_lookaside()
 	init_hugepages
 	
 	device_id=18a0
-	drivers=("uio" "authenc" "dh_generic" "crc8" "uio_pci_generic" "ice_sw nd_vis=0" "ice_sw_ae" "ies" "hqm" "adk_netd netlink_mode=0")
+	drivers=("uio" "authenc" "dh_generic" "crc8" "uio_pci_generic" "ice_sw" "ice_sw_ae" "ies" "hqm" "adk_netd netlink_mode=0")
 	for i in "${drivers[@]}"
         do
             load_driver $i
@@ -284,7 +291,7 @@ run_cpu_dsi_lpbk()
 
 	sleep 5
 
-	/opt/rdk-samples/cpu_dsi_lpbk -n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,tx_mode=advanced,cmpltnq=1 --vdev=event_ihqm -- -p /opt/rdk-samples/cpu_dsi_traffic.pcap -t 60
+	/opt/rdk-samples/cpu_dsi_lpbk -n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,tx_mode=advanced,cmpltnq=1 --vdev=event_ihqm -- -p /opt/rdk-samples/cpu_dsi_traffic.pcap -t 60 -s 25
 
 	if [ $? -eq 0 ]; then
 		echo "CPU DSI Traffic Loopback Test Passed"
@@ -315,7 +322,7 @@ run_cpu_inline_lpbk()
 		
 	sleep 5
 	
-	/opt/rdk-samples/cpu_inline_lpbk -n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,tx_mode=advanced,cmpltnq=1,ipsec_enable=1 --vdev=event_ihqm -- -p /opt/rdk-samples/plaintxt.pcap -t 60  -e -r /opt/rdk-samples/ipsec.pcap
+	/opt/rdk-samples/cpu_inline_lpbk -n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,tx_mode=advanced,cmpltnq=1,ipsec_enable=1 --vdev=event_ihqm -- -p /opt/rdk-samples/plaintxt.pcap -t 60 -e -r /opt/rdk-samples/ipsec.pcap -s 25
 	
 	if [ $? -eq 0 ]; then
         echo "Inline Encrypt Traffic Loopback Test Passed"
@@ -338,7 +345,7 @@ run_cpu_inline_lpbk()
 	driver_init_inline
 	sleep 5
 	
-	/opt/rdk-samples/-n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,tx_mode=advanced,cmpltnq=1,ipsec_enable=1 --vdev=event_ihqm -- -p /opt/rdk-samples/ipsec.pcap -t 60 -r /opt/rdk-samples/plaintxt.pcap
+	/opt/rdk-samples/cpu_inline_lpbk -n 4 --vdev=net_ice_dsi0,pci-bdf=b4:00.0,rxq=21,txq=21,tx_mode=advanced,cmpltnq=1,ipsec_enable=1 --vdev=event_ihqm -- -p /opt/rdk-samples/ipsec.pcap -t 60 -r /opt/rdk-samples/plaintxt.pcap -s 25
 	
 	if [ $? -eq 0 ]; then
         echo "Inline Decrypt Traffic Loopback Test Passed"
