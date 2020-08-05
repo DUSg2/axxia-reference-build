@@ -64,7 +64,7 @@ AXXIA_RDK_KLM=$(shell ls $(SNR_RDK_DIR)/rdk_klm_src_*xz)
 AXXIA_RDK_USER=$(shell ls $(SNR_RDK_DIR)/rdk_user_src_*xz)
 endif
 
-AXXIA_REL=snr_ase_rdk_2007
+AXXIA_REL=snr_ase_rdk_2007.1
 ENABLE_AXXIA_RDK=yes
 
 SNR_BASE=/wr/installs/snr
